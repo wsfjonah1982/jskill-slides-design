@@ -1,0 +1,944 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bible Study Template</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ╔══════════════════════════════════════════════════════════════════════╗
+         ║  BIBLE STUDY — "Ivory & Gold Scripture" deck system                   ║
+         ║  Fixed 1920 × 1080 canvas, scaled to fit the window. Elements are     ║
+         ║  positioned in canvas px. Detail (passages, notes, tables) lives in   ║
+         ║  click-to-enlarge popups; the slide stays light.                      ║
+         ╚══════════════════════════════════════════════════════════════════════╝ */
+
+      /* ── TOKENS ─────────────────────────────────────────────────────────── */
+      :root {
+        /* paper */
+        --ivory: #f6eee1;
+        --ivory-deep: #efe3cf;
+        /* gold = title / ornament */
+        --gold: #b98a4e;
+        --gold-dark: #8a5f1f;
+        --gold-light: #d8b88a;
+        --gold-line: #d9bd8f;
+        /* teal = structure / label / positive */
+        --teal: #24565b;
+        --teal-soft: #4c7b7f;
+        /* copper + peach = number badges */
+        --copper: #c0703f;
+        --peach: #f3d9bf;
+        /* crimson = warning / negative wording only */
+        --crimson: #9a3f33;
+        /* text */
+        --ink: #2f3b3c;
+        --ink-soft: #5b6768;
+
+        --serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong",
+          "SimSun", serif;
+
+        /* type scale (canvas px) */
+        --sz-cover: 112px;
+        --sz-title: 64px;
+        --sz-subtitle: 28px;
+        --sz-col-head: 36px;
+        --sz-body: 25px;
+        --sz-verse: 23px;
+        --sz-verse-lg: 29px;
+        --sz-list: 32px;
+        --sz-pill: 19px;
+        --sz-pop: 48px;
+        --sz-pop-note: 38px;
+
+        --dur-slide: 0.45s;
+        --expand-gold: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b98a4e' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7'/%3E%3C/svg%3E");
+        --expand-white: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7'/%3E%3C/svg%3E");
+      }
+
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body { height: 100%; }
+      body {
+        overflow: hidden;
+        background: #e6dccb; /* letterbox around the canvas */
+        font-family: var(--serif);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ── ENGINE: fixed canvas, scaled to fit ─────────────────────────────── */
+      #deck {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 1920px;
+        height: 1080px;
+        transform-origin: center center;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 30px 90px rgba(90, 60, 20, 0.18);
+      }
+      .slide {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        font-family: var(--serif);
+        color: var(--ink);
+        background:
+          radial-gradient(ellipse 70% 55% at 50% 42%, rgba(255, 250, 238, 0.85), rgba(255, 250, 238, 0) 70%),
+          radial-gradient(circle at 8% 100%, rgba(217, 189, 143, 0.22), rgba(217, 189, 143, 0) 40%),
+          radial-gradient(circle at 96% 100%, rgba(76, 123, 127, 0.1), rgba(76, 123, 127, 0) 38%),
+          var(--ivory);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity var(--dur-slide) ease, visibility 0s linear var(--dur-slide);
+      }
+      .slide.is-active {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity var(--dur-slide) ease, visibility 0s;
+        z-index: 1;
+      }
+
+      /* entrance: only the active slide animates, so print/inactive slides stay fully visible */
+      @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+      @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+      .slide.is-active [data-anim="fade-up"] { animation: rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+      .slide.is-active [data-anim="fade-in"] { animation: fade 0.6s ease both; }
+      .slide.is-active [data-delay="1"] { animation-delay: 0.1s; }
+      .slide.is-active [data-delay="2"] { animation-delay: 0.2s; }
+      .slide.is-active [data-delay="3"] { animation-delay: 0.3s; }
+      .slide.is-active [data-delay="4"] { animation-delay: 0.4s; }
+      .slide.is-active [data-delay="5"] { animation-delay: 0.5s; }
+
+      /* nav dots + counter sit outside the canvas, bottom of the window */
+      #nav-dots {
+        position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%);
+        display: flex; gap: 10px; z-index: 10;
+      }
+      .nav-dot {
+        width: 9px; height: 9px; border-radius: 50%; border: 0; cursor: pointer;
+        background: rgba(185, 138, 78, 0.35);
+      }
+      .nav-dot.is-active { background: var(--gold); transform: scale(1.3); }
+      #slide-counter {
+        position: fixed; right: 18px; bottom: 10px; z-index: 10;
+        font-size: 13px; letter-spacing: 0.12em; color: var(--ink-soft);
+      }
+
+      /* ── SHARED CHROME: centred title between fading gold rules ──────────── */
+      .head { position: absolute; left: 0; right: 0; top: 24px; text-align: center; }
+      .title-row {
+        display: flex; align-items: center; justify-content: center; gap: 36px;
+        padding: 0 220px;
+      }
+      .title-row .rule {
+        flex: 1; height: 2px; position: relative;
+        background: linear-gradient(90deg, rgba(217, 189, 143, 0), var(--gold-line));
+      }
+      .title-row .rule.r { background: linear-gradient(270deg, rgba(217, 189, 143, 0), var(--gold-line)); }
+      .title-row .rule::after {
+        content: ""; position: absolute; top: 50%; width: 9px; height: 9px;
+        background: var(--gold); transform: translateY(-50%) rotate(45deg);
+      }
+      .title-row .rule.l::after { right: -4px; }
+      .title-row .rule.r::after { left: -4px; }
+      .title {
+        font-size: var(--sz-title); line-height: 1.15; font-weight: 700;
+        color: var(--gold); letter-spacing: 0.04em; white-space: nowrap;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+      }
+      .title .paren { font-weight: 500; }
+      .subtitle {
+        margin-top: 6px; font-size: var(--sz-subtitle);
+        color: var(--teal); letter-spacing: 0.06em;
+      }
+      .subtitle b { color: var(--gold); font-weight: 600; }
+      .subtitle b.warn { color: var(--crimson); }
+
+      /* olive-branch corner ornaments (SVG symbol #olive) */
+      .olive { position: absolute; top: 18px; width: 190px; height: 190px; pointer-events: none; opacity: 0.95; }
+      .olive.tl { left: 14px; }
+      .olive.tr { right: 14px; transform: scaleX(-1); }
+      .olive.bl { top: auto; bottom: 18px; left: 14px; transform: scaleY(-1); }
+      .olive.br { top: auto; bottom: 18px; right: 14px; transform: scale(-1, -1); }
+      .olive.sm { width: 140px; height: 140px; top: 8px; }
+
+      /* ── HIGHLIGHT MARKER ────────────────────────────────────────────────── */
+      .hl {
+        color: var(--gold-dark); font-weight: 700; white-space: nowrap;
+        background: linear-gradient(transparent 60%, rgba(216, 184, 138, 0.55) 60%);
+      }
+      .hl.warn {
+        color: var(--crimson); font-weight: 600; background: none; white-space: normal;
+        border-bottom: 2px solid rgba(154, 63, 51, 0.45);
+      }
+
+      /* ── VERSE CARD: the one scripture component, clickable everywhere ───── */
+      .verse {
+        position: relative; cursor: pointer;
+        background: rgba(255, 255, 255, 0.62);
+        border-left: 6px solid var(--gold);
+        border-radius: 6px 18px 18px 6px;
+        box-shadow: 0 8px 26px rgba(120, 90, 40, 0.1);
+        padding: 14px 22px 16px 24px;
+        margin-bottom: 12px;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+      }
+      .verse:hover, .verse:focus-visible { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(120, 90, 40, 0.2); }
+      .verse:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+      .verse::after {
+        content: ""; position: absolute; top: 12px; right: 14px; width: 22px; height: 22px;
+        opacity: 0.5; transition: opacity 0.18s ease;
+        background: var(--expand-gold) center / contain no-repeat;
+      }
+      .verse:hover::after, .verse:focus-visible::after { opacity: 1; }
+      .ref {
+        display: inline-block; font-size: var(--sz-pill); letter-spacing: 0.16em; font-weight: 500;
+        color: #fff; background: var(--teal);
+        padding: 3px 16px 3px 19px; border-radius: 999px; margin-bottom: 8px;
+      }
+      .verse .text {
+        font-size: var(--sz-verse); line-height: 1.62; color: var(--ink);
+        text-align: justify; text-wrap: pretty;
+      }
+      .verse.lg { padding: 40px 40px 36px 42px; border-radius: 8px 24px 24px 8px; margin: 0; display: flex; flex-direction: column; }
+      .verse.lg::after { top: 18px; right: 22px; width: 28px; height: 28px; }
+      .verse.lg .ref { align-self: flex-start; font-size: 22px; padding: 6px 22px 6px 26px; margin-bottom: 26px; }
+      .verse.lg .text { font-size: var(--sz-verse-lg); line-height: 1.86; }
+      .pop-extra, .pop-data { display: none; } /* shown only inside the popup */
+
+      /* reference chip: only the teal pill shows; .text + .pop-extra open in the popup */
+      .vchip { width: fit-content; margin: 0 auto; cursor: pointer; }
+      .vchip .text { display: none; }
+      .vchip .ref {
+        display: block; position: relative; margin: 0;
+        font-size: 24px; letter-spacing: 0.14em; white-space: nowrap;
+        padding: 6px 54px 6px 26px;
+        box-shadow: 0 8px 20px rgba(36, 86, 91, 0.22);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+      }
+      .vchip .ref::after {
+        content: ""; position: absolute; right: 20px; top: 50%; width: 22px; height: 22px; margin-top: -11px;
+        opacity: 0.8; background: var(--expand-white) center / contain no-repeat;
+      }
+      .vchip:hover .ref, .vchip:focus-visible .ref { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(36, 86, 91, 0.3); }
+      .vchip:focus-visible { outline: none; }
+      .vchip:focus-visible .ref { outline: 3px solid var(--gold); outline-offset: 3px; }
+
+      /* ── NUMBER BADGE ────────────────────────────────────────────────────── */
+      .badge {
+        width: 46px; height: 46px; border-radius: 50%; flex: none;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 26px; font-weight: 600; color: var(--copper);
+        background: radial-gradient(circle at 35% 30%, #fbe9d6, var(--peach));
+        border: 2.5px solid var(--copper);
+        box-shadow: 0 0 0 4px rgba(243, 217, 191, 0.5);
+      }
+
+      /* ── IMAGE: framed figure + feathered picture band ───────────────────── */
+      .figure {
+        border: 3px solid var(--gold-light); border-radius: 14px; overflow: hidden; background: #f5eee8;
+        box-shadow: 0 16px 44px rgba(90, 60, 20, 0.18), 0 0 0 8px rgba(255, 255, 255, 0.55);
+        margin: 8px 8px 0;
+      }
+      .figure img { display: block; width: 100%; height: auto; }
+      .caption { margin-top: 24px; text-align: center; font-size: 20px; color: var(--ink-soft); letter-spacing: 0.08em; }
+      .caption b { color: var(--teal); font-weight: 600; }
+      /* a crop of a generated 16:9 illustration (2688×1536 → 1920 wide); move the image with a negative top */
+      .band {
+        position: absolute; left: 0; width: 1920px; top: 152px; height: 352px; overflow: hidden;
+        -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
+        mask-image: linear-gradient(180deg, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
+      }
+      .band img { position: absolute; left: 0; top: -474px; width: 1920px; height: auto; display: block; }
+      .band.radial {
+        -webkit-mask-image: radial-gradient(ellipse 62% 100% at 50% 50%, #000 54%, transparent 90%);
+        mask-image: radial-gradient(ellipse 62% 100% at 50% 50%, #000 54%, transparent 90%);
+      }
+
+      /* placeholder until the illustration exists — delete when the <img> goes in */
+      .ph {
+        display: flex; align-items: center; justify-content: center; text-align: center;
+        font-size: 22px; letter-spacing: 0.1em; color: var(--gold);
+        background: repeating-linear-gradient(135deg, rgba(217, 189, 143, 0.12) 0 14px, rgba(217, 189, 143, 0.04) 14px 28px);
+        border: 2px dashed var(--gold-line);
+      }
+      .figure .ph { aspect-ratio: 16 / 9; border: 0; }
+      .band .ph { position: absolute; inset: 14px 0; border-left: 0; border-right: 0; }
+      .band .ph .circ {
+        position: absolute; top: 50%; width: 270px; height: 270px; margin: -135px 0 0 -135px;
+        border-radius: 50%; border: 6px solid rgba(36, 86, 91, 0.35); background: rgba(255, 255, 255, 0.45);
+      }
+
+      /* ── THREE COLUMNS centred under the three circles of a picture band ── */
+      .cols { position: absolute; top: 520px; left: 0; width: 1920px; }
+      .col { position: absolute; top: 0; width: 570px; }
+      .col.c1 { left: 89px; }   /* circle centre x≈374 */
+      .col.c2 { left: 675px; }  /* x≈960 */
+      .col.c3 { left: 1270px; } /* x≈1555 */
+      .col-head { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 14px; }
+      .col-head h2 { font-size: var(--sz-col-head); font-weight: 700; color: var(--teal); letter-spacing: 0.06em; }
+      .note { font-size: var(--sz-body); line-height: 1.62; color: var(--ink); margin-bottom: 18px; padding: 0 6px; text-align: center; text-wrap: pretty; }
+      .note em { font-style: normal; color: var(--copper); font-weight: 700; }
+      .note .dim { color: var(--ink-soft); }
+
+      /* ── CLOSING BANNER: notched ribbon, one sentence, may open a popup ──── */
+      .banner {
+        position: absolute; left: 190px; right: 190px; bottom: 74px; height: 78px;
+        display: flex; align-items: center; justify-content: center; text-align: center;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(251, 241, 222, 0.9));
+        border: 2px solid var(--gold);
+        clip-path: polygon(0 0, 100% 0, 98.6% 50%, 100% 100%, 0 100%, 1.4% 50%);
+        font-size: var(--sz-body); color: var(--teal); font-weight: 600; letter-spacing: 0.02em;
+        padding: 0 46px; white-space: nowrap;
+      }
+      .banner b { color: var(--crimson); }
+      .banner b.g { color: var(--gold-dark); }
+      .banner[data-pop] { cursor: pointer; padding-right: 96px; transition: transform 0.18s ease, filter 0.18s ease; }
+      .banner[data-pop]:hover, .banner[data-pop]:focus-visible {
+        transform: translateY(-2px); outline: none;
+        filter: brightness(1.03) drop-shadow(0 8px 14px rgba(120, 90, 40, 0.18));
+      }
+      .banner[data-pop]::after {
+        content: ""; position: absolute; right: 56px; top: 50%; width: 28px; height: 28px; margin-top: -14px;
+        opacity: 0.55; background: var(--expand-gold) center / contain no-repeat;
+      }
+
+      /* ── STAGE CHIPS: a short progression ────────────────────────────────── */
+      .stages { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 18px; }
+      .stage-chip {
+        display: flex; align-items: center; gap: 12px; white-space: nowrap;
+        background: rgba(255, 255, 255, 0.62); border: 1.5px solid var(--gold-line);
+        border-radius: 999px; padding: 10px 26px 10px 16px; font-size: 22px; color: var(--ink);
+      }
+      .stage-chip i { width: 16px; height: 16px; border-radius: 50%; display: block; flex: none; }
+      .stage-chip small { font-size: 22px; color: var(--ink-soft); }
+      .stage-arrow { color: var(--gold); font-size: 28px; line-height: 1; }
+
+      /* ── NUMBERED VERSE LIST joined by a gold thread ─────────────────────── */
+      .vlist {
+        position: absolute; left: 170px; right: 170px; top: 184px; list-style: none;
+        display: flex; flex-direction: column; gap: 16px;
+      }
+      .vlist::before {
+        content: ""; position: absolute; left: 27px; top: 36px; bottom: 36px; width: 2px;
+        background: linear-gradient(180deg, transparent, var(--gold-line) 8%, var(--gold-line) 92%, transparent);
+      }
+      .vlist li { position: relative; display: grid; grid-template-columns: 56px 1fr; gap: 26px; align-items: center; }
+      .vlist .badge { width: 56px; height: 56px; font-size: 30px; position: relative; z-index: 1; }
+      .vlist .verse { margin: 0; padding: 16px 40px 18px 32px; }
+      .vlist .verse .ref { font-size: 22px; padding: 4px 20px 4px 24px; }
+      .vlist .verse .text { font-size: var(--sz-list); line-height: 1.55; text-align: left; }
+
+      /* ── COMPARISON TABLE: dimension · positive (teal) · negative (crimson) ─ */
+      .cmp {
+        position: absolute; left: 138px; top: 146px; width: 1644px;
+        table-layout: fixed; border-collapse: separate; border-spacing: 12px 14px;
+      }
+      .cmp th, .cmp td { border-radius: 16px; font-weight: 500; text-align: left; vertical-align: middle; }
+      .cmp thead th {
+        height: 90px; padding: 0 30px; color: #fff; font-size: 38px; font-weight: 700; letter-spacing: 0.06em;
+        box-shadow: 0 8px 20px rgba(60, 50, 30, 0.14);
+      }
+      .cmp thead th small { font-size: 24px; font-weight: 400; letter-spacing: 0.02em; opacity: 0.92; margin-left: 6px; }
+      .h-dim { background: linear-gradient(180deg, #c99a5f, var(--gold)); text-align: center !important; }
+      .h-pos { background: linear-gradient(180deg, #2f6b71, var(--teal)); }
+      .h-neg { background: linear-gradient(180deg, #ad4d40, var(--crimson)); }
+      .h-gold { background: linear-gradient(180deg, #cba166, var(--gold)); }
+      .cmp tbody tr { height: 148px; }
+      .cmp tbody th {
+        padding: 0 26px; background: rgba(243, 217, 191, 0.6); border: 1.5px solid rgba(217, 189, 143, 0.7);
+        color: var(--teal); font-size: 34px; font-weight: 700; letter-spacing: 0.05em;
+      }
+      .cmp .lab { display: flex; align-items: center; gap: 18px; }
+      .cmp .lab .badge { width: 48px; height: 48px; font-size: 27px; }
+      .cmp tbody td { padding: 14px 32px; font-size: 32px; line-height: 1.5; color: var(--ink); }
+      .cmp .it + .it { margin-top: 10px; padding-top: 10px; border-top: 1.5px dashed rgba(91, 103, 104, 0.28); }
+      .c-pos { background: rgba(36, 86, 91, 0.09); border: 1.5px solid rgba(36, 86, 91, 0.24); }
+      .c-neg { background: rgba(154, 63, 51, 0.075); border: 1.5px solid rgba(154, 63, 51, 0.24); }
+      .c-gold { background: rgba(185, 138, 78, 0.13); border: 1.5px solid rgba(185, 138, 78, 0.36); }
+      .c-pos b { color: var(--teal); font-weight: 700; }
+      .c-neg b { color: var(--crimson); font-weight: 700; }
+      .c-gold b { color: var(--gold-dark); font-weight: 700; }
+
+      /* ── DISCUSSION QUESTION CARDS ───────────────────────────────────────── */
+      .qlist { position: absolute; left: 200px; right: 200px; top: 176px; bottom: 120px; display: flex; flex-direction: column; justify-content: center; gap: 36px; }
+      .qcard {
+        display: grid; grid-template-columns: 64px 1fr auto; gap: 28px; align-items: center;
+        padding: 28px 36px 28px 30px;
+        background: rgba(255, 255, 255, 0.62);
+        border: 1.5px solid var(--gold-line); border-radius: 18px;
+        box-shadow: 0 8px 26px rgba(120, 90, 40, 0.08);
+      }
+      .qcard .badge { width: 64px; height: 64px; font-size: 34px; }
+      .qcard .q { font-size: 36px; font-weight: 700; color: var(--teal); line-height: 1.4; letter-spacing: 0.03em; text-wrap: balance; }
+      .qcard .hint { margin-top: 6px; font-size: 25px; color: var(--ink-soft); line-height: 1.5; }
+      .qcard .vchip { margin: 0; }
+
+      /* ── COVER ───────────────────────────────────────────────────────────── */
+      .s-cover .olive { width: 260px; height: 260px; }
+      .cover-body { position: absolute; left: 260px; right: 260px; top: 150px; text-align: center; }
+      .kicker {
+        display: inline-block; padding: 8px 30px; border-radius: 999px;
+        font-size: 26px; letter-spacing: 0.2em; color: #fff; background: var(--teal);
+      }
+      .cover-title {
+        margin-top: 40px; font-size: var(--sz-cover); line-height: 1.15; font-weight: 700;
+        color: var(--gold); letter-spacing: 0.06em; text-shadow: 0 2px 0 rgba(255, 255, 255, 0.8);
+      }
+      .cover-rule { display: flex; align-items: center; justify-content: center; gap: 22px; margin: 34px auto 26px; width: 760px; }
+      .cover-rule::before, .cover-rule::after { content: ""; flex: 1; height: 2px; background: linear-gradient(90deg, rgba(217, 189, 143, 0), var(--gold-line)); }
+      .cover-rule::after { background: linear-gradient(270deg, rgba(217, 189, 143, 0), var(--gold-line)); }
+      .cover-rule i { width: 12px; height: 12px; background: var(--gold); transform: rotate(45deg); }
+      .cover-sub { font-size: 40px; color: var(--teal); letter-spacing: 0.08em; }
+      .cover-sub b { color: var(--gold); font-weight: 600; }
+      .verse.lg.cover-verse { margin: 48px auto 0; width: 1180px; text-align: left; }
+      .cover-meta {
+        position: absolute; left: 0; right: 0; bottom: 84px;
+        display: flex; justify-content: center; gap: 56px;
+        font-size: 24px; letter-spacing: 0.14em; color: var(--ink-soft);
+      }
+      .cover-meta span + span::before { content: "◆"; color: var(--gold-line); font-size: 14px; margin-right: 56px; vertical-align: 3px; }
+
+      /* ── MEMORY VERSE (closing) ──────────────────────────────────────────── */
+      .memory { position: absolute; left: 280px; right: 280px; top: 330px; text-align: center; }
+      .memory .ref { font-size: 30px; padding: 8px 34px; letter-spacing: 0.2em; margin-bottom: 40px; }
+      .memory .text { font-size: 54px; line-height: 1.75; color: var(--ink); text-wrap: balance; }
+
+      /* ── POPUP (mounted inside the active slide, so it scales with the canvas) */
+      .pop-overlay {
+        position: absolute; inset: 0; z-index: 100;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(28, 58, 62, 0.44);
+        -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px);
+        opacity: 0; transition: opacity 0.18s ease;
+      }
+      .pop-overlay.show { opacity: 1; }
+      .pop-panel {
+        position: relative; width: 1560px; /* must fit 1080px: ~4 lines of main text + 3–4 notes */
+        padding: 54px 84px 60px 92px;
+        background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(255, 250, 238, 0.9), rgba(255, 250, 238, 0) 75%), var(--ivory);
+        border: 2px solid var(--gold-light); border-left: 14px solid var(--gold);
+        border-radius: 14px 36px 36px 14px;
+        box-shadow: 0 40px 120px rgba(20, 40, 40, 0.45);
+        transform: translateY(16px) scale(0.97); transition: transform 0.2s ease;
+      }
+      .pop-overlay.show .pop-panel { transform: none; }
+      .pop-panel > .ref { font-size: 34px; letter-spacing: 0.18em; padding: 8px 30px 8px 34px; margin-bottom: 32px; }
+      .pop-panel > .text { font-size: var(--sz-pop); line-height: 1.8; color: var(--ink); text-align: justify; text-wrap: pretty; }
+      .pop-panel .pop-extra { display: block; margin-top: 30px; padding-top: 26px; border-top: 2px dashed var(--gold-line); }
+      .pop-extra ul { list-style: none; }
+      .pop-extra li { position: relative; padding-left: 40px; font-size: var(--sz-pop-note); line-height: 1.6; color: var(--ink); text-wrap: pretty; }
+      .pop-extra li + li { margin-top: 14px; }
+      .pop-extra li::before {
+        content: ""; position: absolute; left: 6px; top: 0.72em; width: 14px; height: 14px;
+        background: var(--gold); transform: rotate(45deg);
+      }
+      .pop-extra i { font-style: italic; color: var(--teal); }
+      .pop-extra .vref { color: var(--teal); font-weight: 700; margin-right: 12px; }
+      .pop-close {
+        position: absolute; top: 22px; right: 26px; width: 64px; height: 64px; border-radius: 50%; cursor: pointer;
+        border: 2px solid var(--gold-line); background: rgba(255, 255, 255, 0.75); color: var(--gold);
+        font: 300 46px/1 Arial, sans-serif; display: flex; align-items: center; justify-content: center; padding-bottom: 4px;
+        transition: background 0.15s ease, color 0.15s ease;
+      }
+      .pop-close:hover, .pop-close:focus-visible { background: var(--teal); color: #fff; border-color: var(--teal); outline: none; }
+      /* table popup */
+      .pop-panel.wide { width: 1740px; padding: 44px 56px 48px 64px; }
+      .pop-panel.wide .pop-close { top: -26px; right: -26px; box-shadow: 0 8px 22px rgba(20, 40, 40, 0.28); }
+      .pop-table { table-layout: fixed; border-collapse: separate; border-spacing: 10px 12px; margin: -6px; width: calc(100% + 12px); }
+      .pop-table th, .pop-table td { border-radius: 14px; text-align: left; vertical-align: middle; font-weight: 500; }
+      .pop-table thead th { height: 78px; padding: 0 28px; color: #fff; font-size: 36px; font-weight: 700; letter-spacing: 0.05em; box-shadow: 0 8px 20px rgba(60, 50, 30, 0.14); }
+      .pop-table thead th small { font-size: 23px; font-weight: 400; opacity: 0.93; margin-left: 8px; }
+      .pop-table tbody tr { height: 104px; }
+      .pop-table tbody th { padding: 0 20px 0 26px; background: rgba(243, 217, 191, 0.6); border: 1.5px solid rgba(217, 189, 143, 0.7); color: var(--teal); font-size: 32px; font-weight: 700; letter-spacing: 0.04em; }
+      .pop-table tbody td { padding: 14px 28px; font-size: 32px; line-height: 1.5; color: var(--ink); text-wrap: pretty; }
+
+      /* ── PRINT: one page per slide, no popups / nav ──────────────────────── */
+      @page { size: 1920px 1080px; margin: 0; }
+      @media print {
+        html, body { height: auto; overflow: visible; background: none; }
+        #deck { position: static; transform: none !important; box-shadow: none; width: 1920px; height: auto; }
+        .slide { position: relative; width: 1920px; height: 1080px; opacity: 1; visibility: visible; break-after: page; }
+        #nav-dots, #slide-counter, .pop-overlay { display: none !important; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Olive-branch ornament: svg.olive.tl containing use href="#olive" -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <defs>
+        <symbol id="olive" viewBox="0 0 190 190">
+          <path d="M8 10 C 46 34, 96 84, 150 172" fill="none" stroke="#c9a56d" stroke-width="2.4" stroke-linecap="round" />
+          <g fill="#5d8a8c" opacity="0.92">
+            <ellipse cx="38" cy="18" rx="7" ry="20" transform="rotate(-38 38 18)" />
+            <ellipse cx="62" cy="52" rx="7.5" ry="22" transform="rotate(-52 62 52)" />
+            <ellipse cx="90" cy="86" rx="7.5" ry="22" transform="rotate(-58 90 86)" />
+            <ellipse cx="118" cy="128" rx="7" ry="20" transform="rotate(-66 118 128)" />
+          </g>
+          <g fill="#e7d3ad" stroke="#c9a56d" stroke-width="1">
+            <ellipse cx="22" cy="46" rx="6.5" ry="19" transform="rotate(28 22 46)" />
+            <ellipse cx="52" cy="82" rx="7" ry="21" transform="rotate(34 52 82)" />
+            <ellipse cx="86" cy="118" rx="7" ry="20" transform="rotate(40 86 118)" />
+            <ellipse cx="124" cy="160" rx="6" ry="17" transform="rotate(48 124 160)" />
+          </g>
+        </symbol>
+      </defs>
+    </svg>
+
+    <nav id="nav-dots"></nav>
+    <div id="slide-counter"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         DECK — 1920×1080 canvas; each section.slide is one slide
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <div id="deck">
+      <!-- ═══════ SLIDE 1 · COVER ═══════════════════════════════════════════
+           Job: name the study. Kicker (series · lesson) → title → passage → key verse → meta. -->
+      <section class="slide s-cover" id="s01" data-label="封面">
+        <svg class="olive tl"><use href="#olive" /></svg>
+        <svg class="olive tr"><use href="#olive" /></svg>
+        <div class="cover-body">
+          <div class="kicker" data-anim="fade-in">[系列名称] · 第 [N] 课</div>
+          <h1 class="cover-title" data-anim="fade-up" data-delay="1">[查经主题]</h1>
+          <div class="cover-rule" data-anim="fade-in" data-delay="2"><i></i></div>
+          <div class="cover-sub" data-anim="fade-up" data-delay="2"><b>经文</b>：[书卷 章:节-节]</div>
+          <article class="verse lg cover-verse" data-anim="fade-up" data-delay="3">
+            <div class="ref">[书卷 章:节]</div>
+            <p class="text">[钥节经文：本课最核心的一段经文，约两到三行，用 <span class="hl">高亮</span> 标出最关键的一句。]</p>
+          </article>
+        </div>
+        <div class="cover-meta" data-anim="fade-in" data-delay="4">
+          <span>[讲员]</span><span>[小组 / 教会]</span><span>[日期]</span>
+        </div>
+      </section>
+
+      <!-- ═══════ SLIDE 2 · SCRIPTURE + IMAGE (layout A) ════════════════════
+           Job: read the key passage. Large verse card left, framed picture + stage chips right. -->
+      <section class="slide s-scripture" id="s02" data-label="经文与配图">
+        <svg class="olive tl"><use href="#olive" /></svg>
+        <svg class="olive tr"><use href="#olive" /></svg>
+        <div class="head">
+          <div class="title-row">
+            <div class="rule l"></div>
+            <div class="title">[本段经文的主题]</div>
+            <div class="rule r"></div>
+          </div>
+          <div class="subtitle"><b>经文</b>：[书卷 章:节-节]</div>
+        </div>
+        <div style="position: absolute; left: 44px; right: 44px; top: 176px; bottom: 90px; display: grid; grid-template-columns: 620px 1fr; gap: 32px">
+          <article class="verse lg" style="align-self: center" data-anim="fade-up" data-delay="1">
+            <div class="ref">[书卷 章:节-节]</div>
+            <p class="text">[经文内容：在此放入本段核心经文的全文，约四到六行。经文较长时，卡片只显示主要部分，点击后在弹窗中以大字完整阅读。可用 <span class="hl">高亮</span> 标出关键词，用 <span class="hl warn">警示色</span> 标出需要特别注意的负面词。]</p>
+            <div class="pop-extra">
+              <ul>
+                <li>[背景注释：历史、文化或原文背景，一句话。]</li>
+                <li>[释义注释：这段经文的要点，可用 <i>斜体</i> 标出关键概念。]</li>
+              </ul>
+            </div>
+          </article>
+          <div style="display: flex; flex-direction: column; min-width: 0" data-anim="fade-up" data-delay="2">
+            <div class="figure">
+              <!-- replace the .ph placeholder with an img (16:9 illustration, with alt text) -->
+              <div class="ph">配图 · 16:9</div>
+            </div>
+            <div class="caption">配图 ｜ <b>[配图标题]</b></div>
+            <div class="stages">
+              <div class="stage-chip"><i style="background: #8b8f92"></i>[阶段一] <small>[说明]</small></div>
+              <div class="stage-arrow">›</div>
+              <div class="stage-chip"><i style="background: #4c7b7f"></i>[阶段二] <small>[说明]</small></div>
+              <div class="stage-arrow">›</div>
+              <div class="stage-chip"><i style="background: #e3b24d"></i>[阶段三] <small>[说明]</small></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════ SLIDE 3 · PICTURE BAND + THREE COLUMNS (layout B) ═════════
+           Job: three parallel points. Band = crop of a 3-circle illustration (centres x≈374/960/1555). -->
+      <section class="slide s-three" id="s03" data-label="三个要点">
+        <svg class="olive tl"><use href="#olive" /></svg>
+        <svg class="olive tr"><use href="#olive" /></svg>
+        <div class="head">
+          <div class="title-row">
+            <div class="rule l"></div>
+            <div class="title">[主题：三个要点]</div>
+            <div class="rule r"></div>
+          </div>
+          <div class="subtitle">从三个方面看<b>[核心概念]</b></div>
+        </div>
+        <div class="band" data-anim="fade-in" data-delay="1">
+          <!-- replace the .ph placeholder with an img (3-circle illustration) and tune its negative top -->
+          <div class="ph">
+            <span class="circ" style="left: 374px"></span><span class="circ" style="left: 960px"></span><span class="circ" style="left: 1555px"></span>
+          </div>
+        </div>
+        <div class="cols">
+          <div class="col c1" data-anim="fade-up" data-delay="2">
+            <div class="col-head"><div class="badge">1</div><h2>[要点一]</h2></div>
+            <p class="note">[一句话说明这个要点，可用 <em>强调</em> 标出关键词。]</p>
+            <div class="vchip" data-pop="verse">
+              <div class="ref">[书卷 章:节]</div>
+              <p class="text">[经文内容：在此放入经文原文，约两到三行。可用 <span class="hl">高亮</span> 标出一两个关键词。]</p>
+            </div>
+          </div>
+          <div class="col c2" data-anim="fade-up" data-delay="3">
+            <div class="col-head"><div class="badge">2</div><h2>[要点二]</h2></div>
+            <p class="note">[一句话说明这个要点，可用 <em>强调</em> 标出关键词。]</p>
+            <div class="vchip" data-pop="verse">
+              <div class="ref">[书卷 章:节]</div>
+              <p class="text">[经文内容：在此放入经文原文，约两到三行。可用 <span class="hl">高亮</span> 标出一两个关键词。]</p>
+            </div>
+          </div>
+          <div class="col c3" data-anim="fade-up" data-delay="4">
+            <div class="col-head"><div class="badge">3</div><h2>[要点三]</h2></div>
+            <p class="note">[一句话说明这个要点，可用 <em>强调</em> 标出关键词。]</p>
+            <div class="vchip" data-pop="verse">
+              <div class="ref">[书卷 章:节]</div>
+              <p class="text">[经文内容：在此放入经文原文，约两到三行。可用 <span class="hl">高亮</span> 标出一两个关键词。]</p>
+              <div class="pop-extra"><ul><li>[注释：只在弹窗中显示的补充说明，可用 <i>斜体</i>。]</li></ul></div>
+            </div>
+          </div>
+        </div>
+        <div class="banner" data-anim="fade-up" data-delay="5">
+          [总结句：把三个要点连起来，指向<b class="g">核心信息</b>。]
+        </div>
+      </section>
+
+      <!-- ═══════ SLIDE 4 · NUMBERED VERSE LIST (layout C) ══════════════════
+           Job: 4–6 supporting passages, in order. -->
+      <section class="slide s-list" id="s04" data-label="经文串连">
+        <svg class="olive tl"><use href="#olive" /></svg>
+        <svg class="olive tr"><use href="#olive" /></svg>
+        <div class="head">
+          <div class="title-row">
+            <div class="rule l"></div>
+            <div class="title">[经文串连主题]</div>
+            <div class="rule r"></div>
+          </div>
+          <div class="subtitle">[一句话说明这些经文的<b>共同线索</b>]</div>
+        </div>
+        <ol class="vlist">
+          <li data-anim="fade-up" data-delay="1">
+            <div class="badge">1</div>
+            <div class="verse"><div class="ref">[书卷 章:节]</div><p class="text">[经文内容：一到两行，用 <span class="hl">高亮</span> 标出与主题相关的词。]</p></div>
+          </li>
+          <li data-anim="fade-up" data-delay="2">
+            <div class="badge">2</div>
+            <div class="verse"><div class="ref">[书卷 章:节]</div><p class="text">[经文内容：一到两行，用 <span class="hl">高亮</span> 标出与主题相关的词。]</p></div>
+          </li>
+          <li data-anim="fade-up" data-delay="3">
+            <div class="badge">3</div>
+            <div class="verse"><div class="ref">[书卷 章:节]</div><p class="text">[经文内容：一到两行，用 <span class="hl">高亮</span> 标出与主题相关的词。]</p></div>
+          </li>
+          <li data-anim="fade-up" data-delay="4">
+            <div class="badge">4</div>
+            <div class="verse"><div class="ref">[书卷 章:节]</div><p class="text">[经文内容：一到两行，用 <span class="hl">高亮</span> 标出与主题相关的词。]</p></div>
+          </li>
+        </ol>
+      </section>
+
+      <!-- ═══════ SLIDE 5 · COMPARISON TABLE (layout D) ═════════════════════
+           Job: two things side by side. Dimension · positive (teal) · negative (crimson). -->
+      <section class="slide s-compare" id="s05" data-label="对比">
+        <svg class="olive tl sm"><use href="#olive" /></svg>
+        <svg class="olive tr sm"><use href="#olive" /></svg>
+        <div class="head">
+          <div class="title-row">
+            <div class="rule l"></div>
+            <div class="title">[对比主题：A vs. B]</div>
+            <div class="rule r"></div>
+          </div>
+        </div>
+        <table class="cmp" data-anim="fade-up" data-delay="1">
+          <colgroup><col style="width: 300px" /><col /><col /></colgroup>
+          <thead>
+            <tr><th class="h-dim">维度</th><th class="h-pos">[A]<small>[简短说明]</small></th><th class="h-neg">[B]<small>[简短说明]</small></th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th><div class="lab"><div class="badge">1</div>[维度一]</div></th>
+              <td class="c-pos"><b>[关键词]</b>：[A 在此维度的表现]</td>
+              <td class="c-neg"><b>[关键词]</b>：[B 在此维度的表现]</td>
+            </tr>
+            <tr>
+              <th><div class="lab"><div class="badge">2</div>[维度二]</div></th>
+              <td class="c-pos"><b>[关键词]</b>：[A 在此维度的表现]</td>
+              <td class="c-neg"><b>[关键词]</b>：[B 在此维度的表现]</td>
+            </tr>
+            <tr>
+              <th><div class="lab"><div class="badge">3</div>[维度三]</div></th>
+              <td class="c-pos"><b>[关键词]</b>：[A 在此维度的表现]</td>
+              <td class="c-neg"><b>[关键词]</b>：[B 在此维度的表现]</td>
+            </tr>
+            <tr>
+              <th><div class="lab"><div class="badge">4</div>[维度四]</div></th>
+              <td class="c-pos"><b>[关键词]</b>：[A 在此维度的表现]</td>
+              <td class="c-neg"><b>[关键词]</b>：[B 在此维度的表现]</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ═══════ SLIDE 6 · DISCUSSION QUESTIONS ════════════════════════════
+           Job: small-group discussion. One card per question; chip opens the supporting passage. -->
+      <section class="slide s-questions" id="s06" data-label="讨论问题">
+        <svg class="olive tl"><use href="#olive" /></svg>
+        <svg class="olive tr"><use href="#olive" /></svg>
+        <div class="head">
+          <div class="title-row">
+            <div class="rule l"></div>
+            <div class="title">小组讨论</div>
+            <div class="rule r"></div>
+          </div>
+          <div class="subtitle">先读经文，再分享<b>生命中的应用</b></div>
+        </div>
+        <div class="qlist">
+          <div class="qcard" data-anim="fade-up" data-delay="1">
+            <div class="badge">1</div>
+            <div><div class="q">[讨论问题一：从经文出发的开放式问题？]</div><div class="hint">思考：[引导方向]</div></div>
+            <div class="vchip" data-pop="verse">
+              <div class="ref">[书卷 章:节]</div>
+              <p class="text">[经文内容：在此放入经文原文，一到两句。]</p>
+            </div>
+          </div>
+          <div class="qcard" data-anim="fade-up" data-delay="2">
+            <div class="badge">2</div>
+            <div><div class="q">[讨论问题二：从经文出发的开放式问题？]</div><div class="hint">思考：[引导方向]</div></div>
+            <div class="vchip" data-pop="verse">
+              <div class="ref">[书卷 章:节]</div>
+              <p class="text">[经文内容：在此放入经文原文，一到两句。]</p>
+            </div>
+          </div>
+          <div class="qcard" data-anim="fade-up" data-delay="3">
+            <div class="badge">3</div>
+            <div><div class="q">[讨论问题三：从经文出发的开放式问题？]</div><div class="hint">思考：[引导方向]</div></div>
+            <div class="vchip" data-pop="verse">
+              <div class="ref">[书卷 章:节]</div>
+              <p class="text">[经文内容：在此放入经文原文，一到两句。]</p>
+              <div class="pop-extra"><ul><li>[带领者提示：只在弹窗中显示。]</li></ul></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════ SLIDE 7 · DIAGRAM + BANNER (layout E) ═════════════════════
+           Job: summary. Diagram crop with a radial fade; banner and diagram open the table popup. -->
+      <section class="slide s-summary" id="s07" data-label="总结">
+        <svg class="olive tl"><use href="#olive" /></svg>
+        <svg class="olive tr"><use href="#olive" /></svg>
+        <div class="head">
+          <div class="title-row">
+            <div class="rule l"></div>
+            <div class="title">[总结主题]</div>
+            <div class="rule r"></div>
+          </div>
+          <div class="subtitle">[一句话概括本课的<b>结构或对比</b>]</div>
+        </div>
+        <div class="band radial" style="top: 160px; height: 640px; cursor: pointer" data-pop-click="table" data-table="t-summary" data-anim="fade-in" data-delay="1">
+          <!-- replace the .ph placeholder with an img (summary diagram, style top: -300px) -->
+          <div class="ph" style="inset: 40px 300px; border-radius: 50%">图示 · 点击查看总结表</div>
+        </div>
+        <div class="banner" data-pop="table" data-table="t-summary" style="bottom: 96px; height: 104px; left: 250px; right: 250px; font-size: 36px; letter-spacing: 0.06em" data-anim="fade-up" data-delay="2">
+          [总结句：<b class="g">核心真理</b>，以及我们的<b>回应</b>]
+        </div>
+        <div class="pop-data" id="t-summary">
+          <table class="pop-table">
+            <colgroup><col style="width: 260px" /><col /><col /></colgroup>
+            <thead><tr><th class="h-dim">[项目]</th><th class="h-gold">[列一]<small>[说明]</small></th><th class="h-pos">[列二]<small>[说明]</small></th></tr></thead>
+            <tbody>
+              <tr><th>[行一]</th><td class="c-gold"><b>[关键词]</b>：[内容]</td><td class="c-pos"><b>[关键词]</b>：[内容]</td></tr>
+              <tr><th>[行二]</th><td class="c-gold"><b>[关键词]</b>：[内容]</td><td class="c-pos"><b>[关键词]</b>：[内容]</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═══════ SLIDE 8 · MEMORY VERSE + APPLICATION (closing) ═══════════
+           Job: send people home with one verse and one action. -->
+      <section class="slide s-memory" id="s08" data-label="金句">
+        <svg class="olive tl"><use href="#olive" /></svg>
+        <svg class="olive tr"><use href="#olive" /></svg>
+        <svg class="olive bl"><use href="#olive" /></svg>
+        <svg class="olive br"><use href="#olive" /></svg>
+        <div class="head">
+          <div class="title-row">
+            <div class="rule l"></div>
+            <div class="title">本周金句</div>
+            <div class="rule r"></div>
+          </div>
+        </div>
+        <div class="memory" data-anim="fade-up" data-delay="1">
+          <div class="ref">[书卷 章:节]</div>
+          <p class="text">[背诵经文：一到两句，<span class="hl">关键词</span>。]</p>
+        </div>
+        <div class="banner" style="bottom: 150px" data-anim="fade-up" data-delay="2">
+          本周应用：[一个具体、可执行的行动]
+        </div>
+      </section>
+    </div>
+    <!-- /deck -->
+
+    <script>
+      /* ══════════════════════════════════════════════════════════════════════
+         ENGINE — scale-to-fit, keys, nav dots, hash, print. No dependencies.
+         ←/→ PgUp/PgDn Space: prev/next · Home/End · 1–9: jump · R: first
+         ══════════════════════════════════════════════════════════════════════ */
+      (function () {
+        "use strict";
+        var W = 1920, H = 1080;
+        var deck = document.getElementById("deck");
+        var slides = Array.prototype.slice.call(deck.querySelectorAll(":scope > .slide"));
+        var dots = document.getElementById("nav-dots");
+        var counter = document.getElementById("slide-counter");
+        var current = -1;
+
+        function fit() {
+          var s = Math.min(window.innerWidth / W, window.innerHeight / H);
+          deck.style.transform = "translate(-50%, -50%) scale(" + s + ")";
+        }
+        function goTo(i) {
+          i = Math.max(0, Math.min(slides.length - 1, i));
+          if (i === current) return;
+          var prev = current;
+          if (prev >= 0) slides[prev].classList.remove("is-active");
+          current = i;
+          slides[i].classList.add("is-active");
+          Array.prototype.forEach.call(dots.children, function (d, k) { d.classList.toggle("is-active", k === i); });
+          counter.textContent = i + 1 + " / " + slides.length;
+          try { history.replaceState(null, "", "#" + (i + 1)); } catch (e) {}
+          deck.dispatchEvent(new CustomEvent("slidechange", { bubbles: true, detail: { index: i, previousIndex: prev, slide: slides[i] } }));
+        }
+        slides.forEach(function (s, i) {
+          var b = document.createElement("button");
+          b.className = "nav-dot";
+          b.setAttribute("aria-label", "第 " + (i + 1) + " 页" + (s.dataset.label ? "：" + s.dataset.label : ""));
+          b.addEventListener("click", function () { goTo(i); });
+          dots.appendChild(b);
+        });
+        document.addEventListener("keydown", function (e) {
+          if (e.ctrlKey || e.metaKey || e.altKey) return;
+          var k = e.key;
+          if (k === "ArrowRight" || k === "ArrowDown" || k === "PageDown" || k === " ") { e.preventDefault(); goTo(current + 1); }
+          else if (k === "ArrowLeft" || k === "ArrowUp" || k === "PageUp") { e.preventDefault(); goTo(current - 1); }
+          else if (k === "Home" || k === "r" || k === "R") goTo(0);
+          else if (k === "End") goTo(slides.length - 1);
+          else if (/^[1-9]$/.test(k)) goTo(+k - 1);
+        });
+        var tx = null;
+        document.addEventListener("touchstart", function (e) { tx = e.touches[0].clientX; }, { passive: true });
+        document.addEventListener("touchend", function (e) {
+          if (tx === null) return;
+          var dx = e.changedTouches[0].clientX - tx;
+          if (Math.abs(dx) > 50) goTo(current + (dx < 0 ? 1 : -1));
+          tx = null;
+        });
+        window.addEventListener("resize", fit);
+        fit();
+        var h = (location.hash || "").match(/^#(\d+)$/);
+        goTo(h ? +h[1] - 1 : 0);
+      })();
+
+      /* ══════════════════════════════════════════════════════════════════════
+         POPUPS — mounted inside the active slide so they scale with the canvas.
+         .verse / [data-pop="verse"]        → ref pill + text at 48px + optional .pop-extra notes
+         [data-pop="table"][data-table=id]  → copy of the hidden #id table (wide panel)
+         [data-pop-click="table"]           → mouse-only extra hit area for the same table
+         Esc / click outside / × closes. Keys never reach the deck while open.
+         ══════════════════════════════════════════════════════════════════════ */
+      (function () {
+        "use strict";
+        var open = null;
+
+        function closeNow() { if (open) { open.ov.remove(); open = null; } }
+        function close() {
+          if (!open) return;
+          var o = open;
+          open = null;
+          o.ov.classList.remove("show");
+          setTimeout(function () { o.ov.remove(); }, 200);
+          if (o.trigger && o.trigger.focus) o.trigger.focus({ preventScroll: true });
+        }
+        function shell(extra) {
+          var ov = document.createElement("div");
+          ov.className = "pop-overlay";
+          var panel = document.createElement("div");
+          panel.className = "pop-panel" + (extra ? " " + extra : "");
+          panel.setAttribute("role", "dialog");
+          panel.setAttribute("aria-modal", "true");
+          var x = document.createElement("button");
+          x.className = "pop-close";
+          x.type = "button";
+          x.setAttribute("aria-label", "关闭");
+          x.textContent = "×";
+          panel.appendChild(x);
+          ov.appendChild(panel);
+          return ov;
+        }
+        function mount(slide, ov, trigger) {
+          slide.appendChild(ov);
+          open = { ov: ov, trigger: trigger };
+          ov.addEventListener("click", function (e) {
+            if (e.target === ov || e.target.closest(".pop-close")) close();
+          });
+          requestAnimationFrame(function () { ov.classList.add("show"); });
+          ov.querySelector(".pop-close").focus({ preventScroll: true });
+        }
+        function showVerse(v) {
+          if (open) return;
+          var ov = shell("");
+          var panel = ov.querySelector(".pop-panel");
+          panel.appendChild(v.querySelector(".ref").cloneNode(true));
+          var t = v.querySelector(".text").cloneNode(true);
+          t.removeAttribute("style");
+          panel.appendChild(t);
+          var extra = v.querySelector(".pop-extra");
+          if (extra) panel.appendChild(extra.cloneNode(true));
+          mount(v.closest(".slide"), ov, v);
+        }
+        function showTable(el) {
+          if (open) return;
+          var slide = el.closest(".slide");
+          var id = el.getAttribute("data-table");
+          var src = id ? document.getElementById(id) : slide.querySelector(".pop-data");
+          var table = src && src.querySelector("table");
+          if (!table) return;
+          var ov = shell("wide");
+          ov.querySelector(".pop-panel").appendChild(table.cloneNode(true));
+          mount(slide, ov, el);
+        }
+        function makeButton(el, label, fn) {
+          el.tabIndex = 0;
+          el.setAttribute("role", "button");
+          el.setAttribute("aria-label", label);
+          el.addEventListener("click", function () { fn(el); });
+          el.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); fn(el); }
+          });
+        }
+        document.querySelectorAll('.verse, [data-pop="verse"]').forEach(function (v) {
+          makeButton(v, v.querySelector(".ref").textContent + "，点击放大阅读", showVerse);
+        });
+        document.querySelectorAll('[data-pop="table"]').forEach(function (el) {
+          makeButton(el, "对比表，点击放大阅读", showTable);
+        });
+        document.querySelectorAll('[data-pop-click="table"]').forEach(function (el) {
+          el.addEventListener("click", function () { showTable(el); });
+        });
+        window.addEventListener("keydown", function (e) {
+          if (!open || e.ctrlKey || e.metaKey || e.altKey || /^F\d+$/.test(e.key)) return;
+          e.stopPropagation();
+          if (e.key === "Escape") { e.preventDefault(); close(); }
+        }, true);
+        document.addEventListener("slidechange", closeNow);
+      })();
+    </script>
+  </body>
+</html>

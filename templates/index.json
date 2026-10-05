@@ -1,0 +1,246 @@
+{
+  "templates": [
+    {
+      "slug": "bible-study",
+      "name": "Bible Study",
+      "tagline": "Ivory paper, gold linework and teal scripture pills; an illuminated-manuscript teaching deck with click-to-read verse popups.",
+      "mood": [
+        "calm",
+        "reverent",
+        "warm",
+        "illustrated",
+        "literary"
+      ],
+      "occasion": [
+        "bible study / 查经",
+        "sermon series",
+        "sunday school",
+        "small-group discussion",
+        "classroom lesson",
+        "Chinese / bilingual teaching deck"
+      ],
+      "tone": [
+        "gentle",
+        "classical",
+        "teaching",
+        "devotional"
+      ],
+      "formality": "medium",
+      "density": "low on the slide, high behind the click",
+      "palette": {
+        "bg": "#f6eee1",
+        "bg_alt": "#efe3cf",
+        "fg": "#2f3b3c",
+        "accent": "#b98a4e",
+        "accent_2": "#24565b",
+        "warning": "#9a3f33",
+        "badge": "#c0703f",
+        "description": "ivory paper with soft radial glows; gold for titles and ornaments, teal for structure and scripture references, copper/peach number badges, crimson only for warning wording"
+      },
+      "typography": {
+        "display": "Noto Serif SC",
+        "body": "Noto Serif SC",
+        "mono": null,
+        "cn": "Noto Serif SC",
+        "style": "one classical serif for everything; centred titles between fading gold rules; verses at 23–32px on the slide and 48px in the popup"
+      },
+      "scheme": "light",
+      "best_for": "Leading a group through key passages and questions: Bible studies, sermon outlines, Sunday-school and small-group lessons, any teaching talk where the slide shows the structure and the full text opens on click. Built for Chinese (Simplified) content; works for English with the same serif.",
+      "avoid_for": "Data-heavy business decks, dark-room keynotes, or anything that needs charts and dense numbers.",
+      "slide_count": 8,
+      "path": "templates/bible-study/"
+    },
+    {
+      "slug": "byteplus",
+      "name": "BytePlus",
+      "tagline": "Navy-and-gold deck with the BytePlus wordmark, product timeline and a media-first runtime for image and video proof slides.",
+      "mood": [
+        "confident",
+        "executive",
+        "editorial",
+        "media-rich",
+        "brand-led"
+      ],
+      "occasion": [
+        "BytePlus industry solution pitch",
+        "customer / agency workshop",
+        "AI creative (Seedream / Seedance) showcase",
+        "product walkthrough with demo videos",
+        "partner briefing"
+      ],
+      "tone": [
+        "polished",
+        "persuasive",
+        "technical-but-accessible"
+      ],
+      "formality": "medium-high",
+      "density": "medium: one claim per slide, proof in images and videos",
+      "palette": {
+        "bg": "#071027",
+        "bg_glow": "radial rgba(48,104,231,.43) at 82% 22% + linear 120deg rgba(109,83,232,.14)",
+        "bg_alt": "#0f1730",
+        "fg": "#e2dcd0",
+        "fg_2": "#8a96a8",
+        "accent": "#c8a870",
+        "border": "#2e3d5c",
+        "brand_blue": "#1259fc",
+        "description": "all-dark deep-navy slides with a blue glow top-right (the BytePlus wordmark is white), warm off-white text, one antique-gold accent; the only other colour comes from the logo, product logos and the customer's media"
+      },
+      "typography": {
+        "display": "Source Serif 4",
+        "body": "DM Sans",
+        "mono": "IBM Plex Mono",
+        "cn": "Noto Serif SC / Noto Sans SC",
+        "style": "serif headlines with a gold-italic second half, sans body, uppercase mono chrome; sizes in calc(N * var(--u)) with --u = min(1vw, 1.7778vh)"
+      },
+      "scheme": "dark",
+      "best_for": "BytePlus solution and product decks that prove claims with real outputs: image before/after pairs, vertical ad videos, demo recordings, plus the standard About-BytePlus timeline.",
+      "avoid_for": "Light-background or printed handouts (no light logo variant packaged), long-form reading, Bible/teaching decks.",
+      "slide_count": 10,
+      "path": "templates/byteplus/"
+    },
+    {
+      "slug": "byteplus-light",
+      "name": "BytePlus Light",
+      "tagline": "The BytePlus deck in the light look of the official BytePlus PowerPoint master: pale blue gradient backgrounds, the dark wordmark, BytePlus blue accents and the same media-first runtime.",
+      "mood": [
+        "clean",
+        "corporate",
+        "bright",
+        "media-rich",
+        "brand-led"
+      ],
+      "occasion": [
+        "BytePlus industry solution pitch",
+        "converting a BytePlus pptx while keeping its look",
+        "architecture and solution walkthrough with diagrams",
+        "customer / partner briefing in a bright room or on a projector",
+        "decks that will also be printed or exported to PDF"
+      ],
+      "tone": [
+        "polished",
+        "clear",
+        "technical-but-accessible"
+      ],
+      "formality": "medium-high",
+      "density": "medium: one claim per slide, proof in diagrams, images and videos",
+      "palette": {
+        "bg": "#f5f8ff",
+        "bg_images": "assets/img/bg-light-cover.jpg (circles + M icon: cover, part, end) and bg-light-content.jpg (white-to-blue gradient: every other slide), from the BytePlus pptx master",
+        "fg": "#1d2028",
+        "fg_2": "#4e5969",
+        "accent": "#0068ff",
+        "border": "#c6d6ef",
+        "header_gradient": "#0092ff → #006cff",
+        "description": "light slides like the BytePlus pptx master; near-black text, one BytePlus-blue accent, white cards and plates with a soft blue shadow"
+      },
+      "typography": {
+        "display": "DM Sans (bold)",
+        "body": "DM Sans",
+        "mono": "IBM Plex Mono",
+        "cn": "Noto Sans SC",
+        "style": "bold sans headlines with the second half in BytePlus blue (no italics), sans body, uppercase mono chrome; sizes in calc(N * var(--u)) with --u = min(1vw, 1.7778vh)"
+      },
+      "scheme": "light",
+      "best_for": "BytePlus decks that should match the official light PowerPoint look: pptx conversions, architecture diagrams framed on white plates, product pitches with image and video proof, the About-BytePlus timeline.",
+      "avoid_for": "Dark-room keynote moods (use byteplus), non-BytePlus brands, Bible/teaching decks.",
+      "slide_count": 10,
+      "path": "templates/byteplus-light/"
+    },
+    {
+      "slug": "studio",
+      "name": "Studio",
+      "tagline": "Black canvas with electric-yellow type; high-voltage design studio aesthetic.",
+      "mood": [
+        "electric",
+        "bold",
+        "graphic",
+        "design-led",
+        "high-contrast"
+      ],
+      "occasion": [
+        "design studio credentials",
+        "creative agency pitch",
+        "brand showcase",
+        "art-direction review",
+        "fashion / sneaker brand",
+        "bilingual EN/CN deck"
+      ],
+      "tone": [
+        "graphic",
+        "loud",
+        "modern",
+        "intentional"
+      ],
+      "formality": "medium",
+      "density": "medium",
+      "palette": {
+        "bg": "#1c1c1c",
+        "bg_alt": "#242422",
+        "fg": "#f5d200",
+        "accent": "#f5d200",
+        "bg_light": "#f5d200",
+        "description": "near-black canvas with one signature electric-yellow that doubles as foreground type AND accent; reverses to yellow-paper mode for breathing room"
+      },
+      "typography": {
+        "display": "Barlow",
+        "body": "Barlow",
+        "mono": "IBM Plex Mono",
+        "cn": "Noto Sans SC",
+        "style": "broadcast-grotesk display + technical mono captions; ultra-high-contrast typographic system"
+      },
+      "scheme": "dark",
+      "best_for": "Anything that should feel electric and design-led: studio credentials, creative agency pitches, brand showcases, art-direction reviews, fashion / sneaker brand work. Also a striking unexpected choice for tech, research, or business decks where the speaker wants the deck to *be* a brand statement.",
+      "avoid_for": "Contexts that should feel quiet or institutional — the black-and-electric-yellow palette is the loudest in the library.",
+      "slide_count": 12,
+      "path": "templates/studio/"
+    },
+    {
+      "slug": "work-review",
+      "name": "Work Review",
+      "tagline": "Executive navy-and-gold review deck for project progress or work performance: results against goals, row-aligned workstreams, initiatives, reflections and next steps, with detail one click away.",
+      "mood": [
+        "confident",
+        "executive",
+        "editorial",
+        "structured"
+      ],
+      "occasion": [
+        "project progress review",
+        "quarterly / half-year review",
+        "performance or probation review",
+        "team results to management",
+        "programme status update"
+      ],
+      "tone": [
+        "factual",
+        "measured",
+        "accountable"
+      ],
+      "formality": "high",
+      "density": "medium on the slide (headline, labelled fields, numbers); detail in popups",
+      "palette": {
+        "bg": "#1c2644",
+        "fg": "#e2dcd0",
+        "fg_2": "#8a96a8",
+        "fg_3": "#4e5a6e",
+        "accent": "#c8a870",
+        "border": "#2e3d5c",
+        "plate": "#ffffff",
+        "description": "all-dark navy with a faint 80px grid, warm off-white text and one antique-gold accent; light diagrams sit on white plates; solid gold marks the single top priority"
+      },
+      "typography": {
+        "display": "Source Serif 4",
+        "body": "DM Sans",
+        "mono": "IBM Plex Mono",
+        "cn": "Noto Serif SC / Noto Sans SC",
+        "style": "48px serif slide titles with a gold underline and gold-italic second half, 30px panel titles, mono uppercase kickers; nothing below 18px at 1600x900"
+      },
+      "scheme": "dark",
+      "best_for": "Any review that reports results against goals and backs them with workstreams, initiatives and a plan: project progress, quarterly business or team reviews, individual performance reviews.",
+      "avoid_for": "Media-heavy product pitches (use byteplus) and warm teaching decks (use bible-study).",
+      "slide_count": 8,
+      "path": "templates/work-review/"
+    }
+  ]
+}

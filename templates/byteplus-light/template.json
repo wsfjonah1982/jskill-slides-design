@@ -1,0 +1,62 @@
+{
+  "slug": "byteplus-light",
+  "name": "BytePlus Light",
+  "tagline": "The BytePlus deck in the light look of the official BytePlus PowerPoint master: pale blue gradient backgrounds, the dark wordmark, BytePlus blue accents and the same media-first runtime.",
+  "mood": [
+    "clean",
+    "corporate",
+    "bright",
+    "media-rich",
+    "brand-led"
+  ],
+  "occasion": [
+    "BytePlus industry solution pitch",
+    "converting a BytePlus pptx while keeping its look",
+    "architecture and solution walkthrough with diagrams",
+    "customer / partner briefing in a bright room or on a projector",
+    "decks that will also be printed or exported to PDF"
+  ],
+  "tone": [
+    "polished",
+    "clear",
+    "technical-but-accessible"
+  ],
+  "formality": "medium-high",
+  "density": "medium: one claim per slide, proof in diagrams, images and videos",
+  "palette": {
+    "bg": "#f5f8ff",
+    "bg_images": "assets/img/bg-light-cover.jpg (circles + M icon: cover, part, end) and bg-light-content.jpg (white-to-blue gradient: every other slide), from the BytePlus pptx master",
+    "fg": "#1d2028",
+    "fg_2": "#4e5969",
+    "accent": "#0068ff",
+    "border": "#c6d6ef",
+    "header_gradient": "#0092ff → #006cff",
+    "description": "light slides like the BytePlus pptx master; near-black text, one BytePlus-blue accent, white cards and plates with a soft blue shadow"
+  },
+  "typography": {
+    "display": "DM Sans (bold)",
+    "body": "DM Sans",
+    "mono": "IBM Plex Mono",
+    "cn": "Noto Sans SC",
+    "style": "bold sans headlines with the second half in BytePlus blue (no italics), sans body, uppercase mono chrome; sizes in calc(N * var(--u)) with --u = min(1vw, 1.7778vh)"
+  },
+  "scheme": "light",
+  "canvas": "fluid 100vw x 100vh slides kept at 16:9 proportions by --u",
+  "best_for": "BytePlus decks that should match the official light PowerPoint look: pptx conversions, architecture diagrams framed on white plates, product pitches with image and video proof, the About-BytePlus timeline.",
+  "avoid_for": "Dark-room keynote moods (use byteplus), non-BytePlus brands, Bible/teaching decks.",
+  "slide_count": 10,
+  "layouts": [
+    "cover",
+    "about BytePlus timeline",
+    "value pills + two product panels",
+    "part opener",
+    "2x2 use-case image grid",
+    "tabs swapping a before/after pair",
+    "three vertical videos",
+    "text card + original/altered video pair",
+    "agent explainer (flow bar + points + full-screen demo)",
+    "thank you"
+  ],
+  "navigation": "slide engine (arrows, space, Home/End, wheel, swipe, nav dots) + media runtime (video model, lightbox, tabs, N notes, F fullscreen)",
+  "source": "generated from templates/byteplus by scripts/make_byteplus_light.py; generate new decks with scripts/build_deck.py"
+}

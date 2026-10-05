@@ -1,0 +1,63 @@
+{
+  "slug": "byteplus",
+  "name": "BytePlus",
+  "tagline": "Navy-and-gold deck with the BytePlus wordmark, product timeline and a media-first runtime for image and video proof slides.",
+  "mood": [
+    "confident",
+    "executive",
+    "editorial",
+    "media-rich",
+    "brand-led"
+  ],
+  "occasion": [
+    "BytePlus industry solution pitch",
+    "customer / agency workshop",
+    "AI creative (Seedream / Seedance) showcase",
+    "product walkthrough with demo videos",
+    "partner briefing"
+  ],
+  "tone": [
+    "polished",
+    "persuasive",
+    "technical-but-accessible"
+  ],
+  "formality": "medium-high",
+  "density": "medium: one claim per slide, proof in images and videos",
+  "palette": {
+    "bg": "#071027",
+    "bg_glow": "radial rgba(48,104,231,.43) at 82% 22% + linear 120deg rgba(109,83,232,.14)",
+    "bg_alt": "#0f1730",
+    "fg": "#e2dcd0",
+    "fg_2": "#8a96a8",
+    "accent": "#c8a870",
+    "border": "#2e3d5c",
+    "brand_blue": "#1259fc",
+    "description": "all-dark deep-navy slides with a blue glow top-right (the BytePlus wordmark is white), warm off-white text, one antique-gold accent; the only other colour comes from the logo, product logos and the customer's media"
+  },
+  "typography": {
+    "display": "Source Serif 4",
+    "body": "DM Sans",
+    "mono": "IBM Plex Mono",
+    "cn": "Noto Serif SC / Noto Sans SC",
+    "style": "serif headlines with a gold-italic second half, sans body, uppercase mono chrome; sizes in calc(N * var(--u)) with --u = min(1vw, 1.7778vh)"
+  },
+  "scheme": "dark",
+  "canvas": "fluid 100vw x 100vh slides kept at 16:9 proportions by --u",
+  "best_for": "BytePlus solution and product decks that prove claims with real outputs: image before/after pairs, vertical ad videos, demo recordings, plus the standard About-BytePlus timeline.",
+  "avoid_for": "Light-background or printed handouts (use byteplus-light), long-form reading, Bible/teaching decks.",
+  "slide_count": 10,
+  "layouts": [
+    "cover",
+    "about BytePlus timeline",
+    "value pills + two product panels",
+    "part opener",
+    "2x2 use-case image grid",
+    "tabs swapping a before/after pair",
+    "three vertical videos",
+    "text card + original/altered video pair",
+    "agent explainer (flow bar + points + full-screen demo)",
+    "thank you"
+  ],
+  "navigation": "slide engine (arrows, space, Home/End, wheel, swipe, nav dots) + media runtime (video model, lightbox, tabs, N notes, F fullscreen)",
+  "source": "BytePlus pitch deck; generate new decks with scripts/build_deck.py"
+}

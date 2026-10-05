@@ -1,0 +1,62 @@
+{
+  "slug": "bible-study",
+  "name": "Bible Study",
+  "tagline": "Ivory paper, gold linework and teal scripture pills; an illuminated-manuscript teaching deck with click-to-read verse popups.",
+  "mood": [
+    "calm",
+    "reverent",
+    "warm",
+    "illustrated",
+    "literary"
+  ],
+  "occasion": [
+    "bible study / 查经",
+    "sermon series",
+    "sunday school",
+    "small-group discussion",
+    "classroom lesson",
+    "Chinese / bilingual teaching deck"
+  ],
+  "tone": [
+    "gentle",
+    "classical",
+    "teaching",
+    "devotional"
+  ],
+  "formality": "medium",
+  "density": "low on the slide, high behind the click",
+  "palette": {
+    "bg": "#f6eee1",
+    "bg_alt": "#efe3cf",
+    "fg": "#2f3b3c",
+    "accent": "#b98a4e",
+    "accent_2": "#24565b",
+    "warning": "#9a3f33",
+    "badge": "#c0703f",
+    "description": "ivory paper with soft radial glows; gold for titles and ornaments, teal for structure and scripture references, copper/peach number badges, crimson only for warning wording"
+  },
+  "typography": {
+    "display": "Noto Serif SC",
+    "body": "Noto Serif SC",
+    "mono": null,
+    "cn": "Noto Serif SC",
+    "style": "one classical serif for everything; centred titles between fading gold rules; verses at 23–32px on the slide and 48px in the popup"
+  },
+  "scheme": "light",
+  "canvas": "fixed 1920x1080, scaled to fit, absolutely positioned in px",
+  "best_for": "Leading a group through key passages and questions: Bible studies, sermon outlines, Sunday-school and small-group lessons, any teaching talk where the slide shows the structure and the full text opens on click. Built for Chinese (Simplified) content; works for English with the same serif.",
+  "avoid_for": "Data-heavy business decks, dark-room keynotes, or anything that needs charts and dense numbers.",
+  "slide_count": 8,
+  "layouts": [
+    "cover",
+    "scripture + image",
+    "picture band + three columns",
+    "numbered verse list",
+    "comparison table",
+    "discussion questions",
+    "diagram + banner (table popup)",
+    "memory verse + application"
+  ],
+  "navigation": "inline engine: ←/→ PgUp/PgDn Space, Home/End, 1–9 jump, R reset, nav dots, swipe, #N deep link; print = one page per slide",
+  "source": "generic teaching deck; all sample passages are placeholders"
+}

@@ -1,0 +1,65 @@
+{
+  "slug": "work-review",
+  "name": "Work Review",
+  "tagline": "Executive navy-and-gold review deck for project progress or work performance: results against goals, row-aligned workstreams, initiatives, reflections and next steps, with detail one click away.",
+  "mood": [
+    "confident",
+    "executive",
+    "editorial",
+    "structured"
+  ],
+  "occasion": [
+    "project progress review",
+    "quarterly / half-year review",
+    "performance or probation review",
+    "team results to management",
+    "programme status update"
+  ],
+  "tone": [
+    "factual",
+    "measured",
+    "accountable"
+  ],
+  "formality": "high",
+  "density": "medium on the slide (headline, labelled fields, numbers); detail in popups",
+  "palette": {
+    "bg": "#1c2644",
+    "fg": "#e2dcd0",
+    "fg_2": "#8a96a8",
+    "fg_3": "#4e5a6e",
+    "accent": "#c8a870",
+    "border": "#2e3d5c",
+    "plate": "#ffffff",
+    "description": "all-dark navy with a faint 80px grid, warm off-white text and one antique-gold accent; light diagrams sit on white plates; solid gold marks the single top priority"
+  },
+  "typography": {
+    "display": "Source Serif 4",
+    "body": "DM Sans",
+    "mono": "IBM Plex Mono",
+    "cn": "Noto Serif SC / Noto Sans SC",
+    "style": "48px serif slide titles with a gold underline and gold-italic second half, 30px panel titles, mono uppercase kickers; nothing below 18px at 1600x900"
+  },
+  "scheme": "dark",
+  "canvas": "fluid 100vw x 100vh slides, sizes in calc(N * var(--u)), --u = min(1vw, 1.7778vh); checked at 1600x900 and 1280x720",
+  "best_for": "Any review that reports results against goals and backs them with workstreams, initiatives and a plan: project progress, quarterly business or team reviews, individual performance reviews.",
+  "avoid_for": "Media-heavy product pitches (use byteplus) and warm teaching decks (use bible-study).",
+  "slide_count": 8,
+  "layouts": [
+    "cover",
+    "results vs goals, two periods",
+    "key highlights: shared context + two workstreams",
+    "progress by workstream, row per field",
+    "key initiatives hub opening full-slide popups",
+    "reflections: what went well / what to improve",
+    "next steps: plan diagram + numbered priorities",
+    "plan in detail: 2x2 diagram grid"
+  ],
+  "popups": [
+    "full-slide popup (initiative-1, initiative-2)",
+    "small popup with image (detail)",
+    "image lightbox"
+  ],
+  "navigation": "arrows, space, Home/End, wheel, swipe, nav dots; popups are outside the arrow-key sequence; Esc closes the top layer",
+  "branding": "none: an [Organisation] text slot sits where a logo would go",
+  "source": "generic review deck; no personal, company or customer information"
+}
