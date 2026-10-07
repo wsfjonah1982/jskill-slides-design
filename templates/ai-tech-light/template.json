@@ -1,0 +1,62 @@
+{
+  "slug": "ai-tech-light",
+  "name": "AI Tech Light",
+  "tagline": "Brand-free light AI deck: pale blue gradient backgrounds, an AI icon in concentric circles on the title pages, bold sans titles with a blue second half and the same media-first runtime as byteplus-light.",
+  "mood": [
+    "clean",
+    "bright",
+    "modern",
+    "media-rich",
+    "tech"
+  ],
+  "occasion": [
+    "AI product or solution pitch for any organisation",
+    "AI model / feature showcase with image and video proof",
+    "architecture and solution walkthrough with diagrams",
+    "customer / partner briefing in a bright room or on a projector",
+    "decks that will also be printed or exported to PDF"
+  ],
+  "tone": [
+    "polished",
+    "clear",
+    "technical-but-accessible"
+  ],
+  "formality": "medium-high",
+  "density": "medium: one claim per slide, proof in diagrams, images and videos",
+  "palette": {
+    "bg": "#f5f8ff",
+    "bg_images": "assets/img/bg-cover.jpg (concentric circles + AI icon: cover, part, end) and bg-content.jpg (white-to-blue gradient: every other slide)",
+    "fg": "#1d2028",
+    "fg_2": "#4e5969",
+    "accent": "#0068ff",
+    "border": "#c6d6ef",
+    "header_gradient": "#0092ff → #006cff",
+    "description": "light pale-blue slides; near-black text, one blue accent, white cards and plates with a soft blue shadow; no logo"
+  },
+  "typography": {
+    "display": "DM Sans (bold)",
+    "body": "DM Sans",
+    "mono": "IBM Plex Mono",
+    "cn": "Noto Sans SC",
+    "style": "bold sans headlines with the second half in blue (no italics), sans body, uppercase mono chrome; sizes in calc(N * var(--u)) with --u = min(1vw, 1.7778vh)"
+  },
+  "scheme": "light",
+  "canvas": "fluid 100vw x 100vh slides kept at 16:9 proportions by --u",
+  "best_for": "AI technology decks for any organisation that want a clean light look without a company brand: product and model pitches with image and video proof, architecture diagrams on white plates, an About-[Organisation] milestone timeline.",
+  "avoid_for": "BytePlus decks (use byteplus-light, which carries the logo), dark-room keynote moods, Bible/teaching decks.",
+  "slide_count": 10,
+  "layouts": [
+    "cover",
+    "about [Organisation] milestone timeline",
+    "value pills + two product panels",
+    "part opener",
+    "2x2 use-case image grid",
+    "tabs swapping a before/after pair",
+    "three vertical videos",
+    "text card + original/altered video pair",
+    "agent explainer (flow bar + points + full-screen demo)",
+    "thank you"
+  ],
+  "navigation": "slide engine (arrows, space, Home/End, wheel, swipe, nav dots) + media runtime (video model, lightbox, tabs, N notes, F fullscreen)",
+  "source": "generated from templates/byteplus + the byteplus-light CSS by scripts/make_ai_tech_light.py; generate new decks with scripts/build_deck.py"
+}

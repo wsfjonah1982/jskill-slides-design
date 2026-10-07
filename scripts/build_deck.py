@@ -11,6 +11,7 @@ Media rules (ratio-locked frames, no-loop video model, lightbox, tabs, notes) co
 see templates/byteplus/design.md.
 """
 import html
+import re
 import shutil
 from pathlib import Path
 
@@ -18,22 +19,32 @@ HERE = Path(__file__).resolve().parent
 
 # ---- CONFIG ------------------------------------------------------------------------------------
 # Folder holding template.html + assets/img/. After copying this script into a project, point it at
-# the skill's templates/byteplus/ (navy & gold) or templates/byteplus-light/ (light pptx-master look) folder.
+# the skill's templates/byteplus/ (navy & gold), templates/byteplus-light/ (light pptx-master look) or
+# templates/ai-tech-light/ (the same light look, brand-free: no logo, AI icon on cover / part / end) folder.
 TEMPLATE_DIR = HERE.parent / "templates" / "byteplus"
 OUT = HERE.parent / "deck.html"             # the generated deck
 TITLE = "Deck Title"
 FOOT_LEFT = "Deck Title · Oct 2026"         # footer left text on every content slide
 PRESENTER = "Presenter Name · Role"
 DATE = "Oct 2026"
+KICKER = "Industry Solution"                # cover / end kicker on ai-tech-light (BytePlus templates keep theirs)
 I = "assets/img/"                           # image folder, relative to OUT
 V = "assets/video/"                         # video folder, relative to OUT
 # ------------------------------------------------------------------------------------------------
 
+GENERIC = (TEMPLATE_DIR / "assets" / "img" / "ai-mark.png").exists()             # ai-tech-light: no brand
 LIGHT = (TEMPLATE_DIR / "assets" / "img" / "byteplus_logo_light.png").exists()   # byteplus-light template
-LOGO_FILE = "byteplus_logo_light.png" if LIGHT else "byteplus_logo_dark.png"
-LOGO = f'<img class="bp-logo" src="{I}{LOGO_FILE}" alt="BytePlus" />'
-LOGO_COVER = f'<img class="bp-logo bp-logo-cover" src="{I}{LOGO_FILE}" alt="BytePlus" />'
-BRAND_FILES = [LOGO_FILE, "bp-mark.png"] + (["bg-light-cover.jpg", "bg-light-content.jpg"] if LIGHT else [])
+if GENERIC:
+    LOGO = LOGO_COVER = PART_MARK = ""
+    KICKER_TEXT = KICKER
+    BRAND_FILES = ["bg-cover.jpg", "bg-content.jpg"]
+else:
+    LOGO_FILE = "byteplus_logo_light.png" if LIGHT else "byteplus_logo_dark.png"
+    LOGO = f'<img class="bp-logo" src="{I}{LOGO_FILE}" alt="BytePlus" />'
+    LOGO_COVER = f'<img class="bp-logo bp-logo-cover" src="{I}{LOGO_FILE}" alt="BytePlus" />'
+    PART_MARK = f'<img class="part-mark" src="{I}bp-mark.png" alt="" />'
+    KICKER_TEXT = "BytePlus Industry Solution"
+    BRAND_FILES = [LOGO_FILE, "bp-mark.png"] + (["bg-light-cover.jpg", "bg-light-content.jpg"] if LIGHT else [])
 
 
 def esc(t):
@@ -150,7 +161,7 @@ def cover(n, total):
       <section class="slide dark slide--cover" id="s{n:02d}">
         {LOGO_COVER}
         <div class="cover-body">
-          <div class="label muted cover-kicker" data-anim="fade-in" data-delay="0">BytePlus Industry Solution</div>
+          <div class="label muted cover-kicker" data-anim="fade-in" data-delay="0">{KICKER_TEXT}</div>
           <div class="rule" data-anim="reveal-right" data-delay="1"></div>
           <h1 class="display cover-title" data-anim="fade-up" data-delay="2">{TITLE.split(" ", 1)[0]} <em>{TITLE.split(" ", 1)[-1]}</em></h1>
           <p class="cover-sub" data-anim="fade-up" data-delay="3">From <em>Before</em> to <em>After</em></p>
@@ -169,7 +180,7 @@ def part(n, total, num, title_html, sub, cards):
       <!-- ═══════ SLIDE {n} · PART {num:02d} ═══════════════════════════════════════ -->
       <section class="slide dark slide--chapter slide--part" id="s{n:02d}">
         {LOGO_COVER}
-        <img class="part-mark" src="{I}bp-mark.png" alt="" />
+        {PART_MARK}
         <div class="chapter-num" data-anim="fade-in" data-delay="0">Part {num:02d}</div>
         <div class="chapter-rule" data-anim="reveal-right" data-delay="1"></div>
         <h1 class="h1 part-title" data-anim="fade-up" data-delay="2">{title_html}</h1>
@@ -204,7 +215,7 @@ def closing(n, total):
       <!-- ═══════ SLIDE {n} · THANK YOU ═══════════════════════════════════════ -->
       <section class="slide dark slide--end" id="s{n:02d}">
         {LOGO_COVER}
-        <div class="kicker" data-anim="fade-in" data-delay="0">BytePlus Industry Solution</div>
+        <div class="kicker" data-anim="fade-in" data-delay="0">{KICKER_TEXT}</div>
         <div class="rule" data-anim="reveal-right" data-delay="1"></div>
         <h1 class="display" style="font-size: calc(7.6 * var(--u))" data-anim="fade-up" data-delay="2">Thank <em>You</em></h1>
         <p class="lead muted" data-anim="fade-up" data-delay="3">{TITLE} · {PRESENTER}</p>
@@ -212,11 +223,14 @@ def closing(n, total):
 '''
 
 
+EXAMPLE_CARDS = ([("Model A", "Image generation and editing model"), ("Model B", "Video generation model")] if GENERIC
+                 else [("Seedream 5.0", "Image generation and editing model"), ("Seedance 2.5", "Video generation model")])
+
 SLIDES = [
     cover,
     example_value,
     lambda n, t: part(n, t, 1, "Test Ideas <em>in Minutes</em>", "Reduce time to market",
-                      [("Seedream 5.0", "Image generation and editing model"), ("Seedance 2.5", "Video generation model")]),
+                      EXAMPLE_CARDS),
     example_agent,
     closing,
 ]
@@ -228,7 +242,7 @@ def build():
     deck_open = '<div id="deck">'
     head = s[: s.index(deck_open) + len(deck_open)]
     tail = s[s.index("    </div>\n    <!-- /deck -->"):]
-    head = head.replace("<title>BytePlus Template</title>", f"<title>{esc(TITLE)}</title>")
+    head = re.sub(r"<title>[^<]*</title>", f"<title>{esc(TITLE)}</title>", head, count=1)
 
     total = len(SLIDES)
     out = head + "\n" + "".join(fn(i + 1, total) for i, fn in enumerate(SLIDES)) + tail

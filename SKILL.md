@@ -1,6 +1,6 @@
 ---
 name: slides-design
-description: Build, convert or revise a polished 16:9 HTML slide deck presented in a browser instead of PowerPoint — from md/txt notes, an existing .pptx or an older HTML deck, using ready templates (BytePlus pitch in dark or light, work review, Bible study, design studio). Use whenever the user asks for slides, a deck, a presentation or "ppt" without naming a file format, says "turn this pptx/md into slides", "md updated, update html" or "pptx is updated", or wants a slide added, fixed or restyled. Not for producing a .pptx file.
+description: Build, convert or revise a polished 16:9 HTML slide deck presented in a browser instead of PowerPoint — from md/txt notes, an existing .pptx or an older HTML deck, using ready templates (BytePlus pitch in dark or light, brand-free light AI tech, work review, Bible study, design studio). Use whenever the user asks for slides, a deck, a presentation or "ppt" without naming a file format, says "turn this pptx/md into slides", "md updated, update html" or "pptx is updated", or wants a slide added, fixed or restyled. Not for producing a .pptx file.
 ---
 
 # Slides Design
@@ -29,7 +29,7 @@ opens in a browser, drives with arrow keys, and that looks finished at any 16:9 
    `template.html`, `template.json`, `design.md`) or one of the systems in `references/design-systems.md`. If none
    fits, build 3 quick cover-slide previews in different styles and let the user choose.
    Match the logo variant to the background (dark logo ⇒ all-dark deck).
-4. **Generate, don't hand-edit (for decks that will change).** For a BytePlus deck (dark `byteplus` or light `byteplus-light`), copy `scripts/build_deck.py`
+4. **Generate, don't hand-edit (for decks that will change).** For a BytePlus deck (dark `byteplus` or light `byteplus-light`) or a brand-free `ai-tech-light` deck, copy `scripts/build_deck.py`
    into the project's `tools/`: it builds on `templates/byteplus/`, slide text lives in small slide functions, and
    `python tools/build_deck.py` writes the HTML — every later change is a script edit + rebuild. Short decks
    (a Bible study, a one-off review) can be a hand-edited copy of the template.
@@ -81,6 +81,7 @@ picking), `design.md` (tokens in YAML front matter + rules). Read `design.md` be
 |---|---|---|
 | `byteplus/` | BytePlus solution / product pitches with image + video proof; brand logos + timeline in `assets/img/` | fluid navy/gold slides + media runtime |
 | `byteplus-light/` | the same BytePlus deck in the light look of the official BytePlus pptx master (pale blue gradient backgrounds, dark logo, BytePlus blue); best for pptx conversions and architecture diagrams | same as `byteplus`, generated from it |
+| `ai-tech-light/` | brand-free AI tech deck in the byteplus-light look: no logo, AI icon in concentric circles on cover / part / end, generic About-[Organisation] timeline; for AI product or solution pitches by any organisation | same as `byteplus`, generated from it |
 | `work-review/` | generic review of project progress or work performance (no personal / company info): results vs goals, workstreams, initiatives, reflections, next steps, popups | fluid navy/gold slides + popup system |
 | `bible-study/` | Bible study, sermons, Sunday school, small groups (Chinese-first) — verse cards, popups, discussion questions | fixed 1920×1080 canvas, inline engine |
 | `studio/` | loud design-studio / brand showcase (black + acid yellow) | horizontal slide strip |
@@ -92,8 +93,9 @@ To start: copy the template folder into the project, rename `template.html`, del
 
 | Path | What it is |
 |---|---|
-| `scripts/build_deck.py` | Generator on top of `templates/byteplus/` or `templates/byteplus-light/` (set `TEMPLATE_DIR`): helpers `feature() cover() part() closing() frame(plate=) diagram() video() video_placeholder() mcell() mrow() pills() points()`; copies the brand images |
+| `scripts/build_deck.py` | Generator on top of `templates/byteplus/`, `templates/byteplus-light/` or `templates/ai-tech-light/` (set `TEMPLATE_DIR`): helpers `feature() cover() part() closing() frame(plate=) diagram() video() video_placeholder() mcell() mrow() pills() points()`; copies the brand images |
 | `scripts/make_byteplus_light.py` | Regenerates `templates/byteplus-light/template.html` from `templates/byteplus/` — re-run after any byteplus change |
+| `scripts/make_ai_tech_light.py` | Regenerates `templates/ai-tech-light/template.html` from `templates/byteplus/` + the light CSS (`--images` rebuilds the AI-icon cover background) — re-run after any byteplus or byteplus-light change |
 | `scripts/validate_deck.js` | Static checks: JS syntax, duplicate IDs, missing local assets, slide IDs, tiny fonts, `object-fit: cover` |
 | `scripts/screenshot_deck.py` | Playwright: PNG of every slide at chosen sizes with transitions off + overflow-vs-footer report |
 | `scripts/export_pdf.py` | Playwright: one PDF page per slide (screenshot-based, works for every template) |

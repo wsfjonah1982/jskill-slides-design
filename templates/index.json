@@ -148,6 +148,54 @@
       "path": "templates/byteplus-light/"
     },
     {
+      "slug": "ai-tech-light",
+      "name": "AI Tech Light",
+      "tagline": "Brand-free light AI deck: pale blue gradient backgrounds, an AI icon in concentric circles on the title pages, bold sans titles with a blue second half and the same media-first runtime as byteplus-light.",
+      "mood": [
+        "clean",
+        "bright",
+        "modern",
+        "media-rich",
+        "tech"
+      ],
+      "occasion": [
+        "AI product or solution pitch for any organisation",
+        "AI model / feature showcase with image and video proof",
+        "architecture and solution walkthrough with diagrams",
+        "customer / partner briefing in a bright room or on a projector",
+        "decks that will also be printed or exported to PDF"
+      ],
+      "tone": [
+        "polished",
+        "clear",
+        "technical-but-accessible"
+      ],
+      "formality": "medium-high",
+      "density": "medium: one claim per slide, proof in diagrams, images and videos",
+      "palette": {
+        "bg": "#f5f8ff",
+        "bg_images": "assets/img/bg-cover.jpg (concentric circles + AI icon: cover, part, end) and bg-content.jpg (white-to-blue gradient: every other slide)",
+        "fg": "#1d2028",
+        "fg_2": "#4e5969",
+        "accent": "#0068ff",
+        "border": "#c6d6ef",
+        "header_gradient": "#0092ff → #006cff",
+        "description": "light pale-blue slides; near-black text, one blue accent, white cards and plates with a soft blue shadow; no logo"
+      },
+      "typography": {
+        "display": "DM Sans (bold)",
+        "body": "DM Sans",
+        "mono": "IBM Plex Mono",
+        "cn": "Noto Sans SC",
+        "style": "bold sans headlines with the second half in blue (no italics), sans body, uppercase mono chrome; sizes in calc(N * var(--u)) with --u = min(1vw, 1.7778vh)"
+      },
+      "scheme": "light",
+      "best_for": "AI technology decks for any organisation that want a clean light look without a company brand: product and model pitches with image and video proof, architecture diagrams on white plates, an About-[Organisation] milestone timeline.",
+      "avoid_for": "BytePlus decks (use byteplus-light, which carries the logo), dark-room keynote moods, Bible/teaching decks.",
+      "slide_count": 10,
+      "path": "templates/ai-tech-light/"
+    },
+    {
       "slug": "studio",
       "name": "Studio",
       "tagline": "Black canvas with electric-yellow type; high-voltage design studio aesthetic.",

@@ -6,7 +6,8 @@ Usage:
 Same slides, CSS engine and media runtime as `byteplus`; only the look changes: the BytePlus pptx master's
 light backgrounds (assets/img/bg-light-cover.jpg with the circles and "M" icon, bg-light-content.jpg gradient),
 the dark-text wordmark (byteplus_logo_light.png), BytePlus blue #0068FF instead of gold, DM Sans titles and blue
-gradient header bars. Re-run after any change to templates/byteplus/template.html so the two stay in sync.
+gradient header bars. Re-run after any change to templates/byteplus/template.html so the two stay in sync; then re-run
+make_ai_tech_light.py, which reuses LIGHT_CSS.
 """
 from pathlib import Path
 
