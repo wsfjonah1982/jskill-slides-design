@@ -82,6 +82,8 @@ components:
     description: "2×2 use-case grid; each cell = label + strip of frames with fr widths matching the images."
   cap-tabs:
     description: "Three tab buttons (icon + benefit) swapping .cap-panel before/after pairs in place; the chosen tab persists."
+  layers:
+    description: "Layer playground (.ly-wrap, scripts/layer_slide.py): one or two images, each a background + transparent cut-out layers; drag to move, corner to resize, top handle to rotate (Shift = 15°), drop on the other image; Hide backgrounds / Hold to see originals / Reset; a thumbnail tray per image. Clicks hit only visible pixels (a 40-column alpha mask per layer). Content = the deck's assets/img/layers/layers.json + images; the template shows a striped placeholder (layer_wrap(None))."
   edit:
     description: "Text column (lead, body, edit-card with meta row + h3) beside an Original/Altered media pair."
   agent:
@@ -110,10 +112,11 @@ Cover → About BytePlus (timeline) → what we offer (value pills + product pan
 | 4 | Part opener | Part NN, claim, outcome, 1–2 product cards, bp-mark watermark |
 | 5 | 2×2 use-case grid | four image use cases, input → output strips |
 | 6 | Tabs · before/after | merge several near-identical capability slides into one clickable slide |
-| 7 | Video grid · 3 vertical | 9:16 ad formats side by side (start 5 s apart) |
-| 8 | Text card + media pair | a capability explained left, original vs altered right |
-| 9 | Agent explainer | flow bar + 4 points + a click-to-full-screen demo |
-| 10 | Thank You | close |
+| 7 | Layer playground | let the audience move, resize and rotate the objects of a layered image (ships as a striped placeholder; the deck supplies its own layered images) |
+| 8 | Video grid · 3 vertical | 9:16 ad formats side by side (start 5 s apart) |
+| 9 | Text card + media pair | a capability explained left, original vs altered right |
+| 10 | Agent explainer | flow bar + 4 points + a click-to-full-screen demo |
+| 11 | Thank You | close |
 
 Other patterns that are in the CSS but not in the sample slides: `.sm-strip` + `.mtag` (static → motion pairs), `.mrow.c2` landscape videos, `slide--models` pills variant.
 
@@ -145,8 +148,13 @@ Source Serif 4 for titles and media labels (second half of a title in gold itali
 1. Copy `templates/byteplus/` (template.html + assets/) into the project; rename the HTML.
 2. Delete or duplicate slides; give each section a unique `id`; update the footer total `NN / TT`.
 3. Replace `[bracketed]` text; replace each `.ph` with real media: `<img src="assets/img/…">` inside `.frame`, or `<video src=… poster=…>` inside `.vid` (remove `ph-label`).
-4. For a larger deck, move to a build script (`scripts/build_deck.py`) instead of hand-editing.
-5. Validate and screenshot (`scripts/validate_deck.js`, `scripts/screenshot_deck.py`), then open it for the user.
+4. Layer playground with your own images: put a background, the original and one transparent PNG per object in
+   `assets/img/layers/`, list them in `layers.json` (see the docstring of `scripts/layer_slide.py`), run
+   `python scripts/layer_slide.py masks assets/img/layers/layers.json`, and swap the slide's `.ly-wrap` for
+   `layer_wrap(...)` output (the build script's `layers()` helper does this). After editing `LAYER_CSS` / `LAYER_JS`,
+   run `python scripts/layer_slide.py sync templates/byteplus/template.html`, then the make scripts.
+5. For a larger deck, move to a build script (`scripts/build_deck.py`) instead of hand-editing.
+6. Validate and screenshot (`scripts/validate_deck.js`, `scripts/screenshot_deck.py`), then open it for the user.
 
 ## Known Gaps
 

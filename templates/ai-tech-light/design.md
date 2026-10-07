@@ -75,7 +75,9 @@ for the slide catalogue, story spine, media rules and do's and don'ts. This file
 ## How it is made
 
 `template.html` is generated: `python scripts/make_ai_tech_light.py` reads `templates/byteplus/template.html`,
-removes every logo and the part watermark, swaps slide 2 for a generic About-[Organisation] timeline, turns
+removes every logo and the part watermark, drops the layer-playground slide (it stays at 10
+slides; the `.ly-*` CSS and script stay, so `layers()` / `layer_wrap()` output still works here), swaps slide 2
+for a generic About-[Organisation] timeline, turns
 product names into `[Model A]` / `[Model B]`, and appends the byteplus-light CSS (imported from
 `make_byteplus_light.py`) with its own background file names. **Don't hand-edit `template.html`** — change the
 script and re-run it. `--images` also rebuilds `bg-cover.jpg` (the light circles, centre mark painted out,

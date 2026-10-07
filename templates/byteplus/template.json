@@ -43,9 +43,9 @@
   },
   "scheme": "dark",
   "canvas": "fluid 100vw x 100vh slides kept at 16:9 proportions by --u",
-  "best_for": "BytePlus solution and product decks that prove claims with real outputs: image before/after pairs, vertical ad videos, demo recordings, plus the standard About-BytePlus timeline.",
+  "best_for": "BytePlus solution and product decks that prove claims with real outputs: image before/after pairs, an interactive layer playground, vertical ad videos, demo recordings, plus the standard About-BytePlus timeline.",
   "avoid_for": "Light-background or printed handouts (use byteplus-light), long-form reading, Bible/teaching decks.",
-  "slide_count": 10,
+  "slide_count": 11,
   "layouts": [
     "cover",
     "about BytePlus timeline",
@@ -53,11 +53,12 @@
     "part opener",
     "2x2 use-case image grid",
     "tabs swapping a before/after pair",
+    "layer playground (drag / resize / rotate cut-out layers, move them between two images)",
     "three vertical videos",
     "text card + original/altered video pair",
     "agent explainer (flow bar + points + full-screen demo)",
     "thank you"
   ],
-  "navigation": "slide engine (arrows, space, Home/End, wheel, swipe, nav dots) + media runtime (video model, lightbox, tabs, N notes, F fullscreen)",
+  "navigation": "slide engine (arrows, space, Home/End, wheel, swipe, nav dots) + media runtime (video model, lightbox, tabs, layer playground, N notes, F fullscreen)",
   "source": "BytePlus pitch deck; generate new decks with scripts/build_deck.py"
 }

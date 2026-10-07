@@ -81,6 +81,10 @@ LIGHT_CSS = """
       .nav-dot { background: rgba(29, 32, 40, 0.18); }
       .nav-dot.is-active { background: var(--c-accent); }
       #slide-counter { color: rgba(29, 32, 40, 0.35); }
+
+      /* Layer playground: white buttons, a soft blue shadow under the images */
+      .ly-canvas { box-shadow: 0 calc(0.6 * var(--u)) calc(1.8 * var(--u)) rgba(0, 60, 160, 0.18); }
+      .ly-tools button { background: #fff; }
 """
 
 

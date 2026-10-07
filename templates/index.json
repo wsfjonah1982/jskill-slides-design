@@ -94,9 +94,9 @@
         "style": "serif headlines with a gold-italic second half, sans body, uppercase mono chrome; sizes in calc(N * var(--u)) with --u = min(1vw, 1.7778vh)"
       },
       "scheme": "dark",
-      "best_for": "BytePlus solution and product decks that prove claims with real outputs: image before/after pairs, vertical ad videos, demo recordings, plus the standard About-BytePlus timeline.",
-      "avoid_for": "Light-background or printed handouts (no light logo variant packaged), long-form reading, Bible/teaching decks.",
-      "slide_count": 10,
+      "best_for": "BytePlus solution and product decks that prove claims with real outputs: image before/after pairs, an interactive layer playground, vertical ad videos, demo recordings, plus the standard About-BytePlus timeline.",
+      "avoid_for": "Light-background or printed handouts (use byteplus-light), long-form reading, Bible/teaching decks.",
+      "slide_count": 11,
       "path": "templates/byteplus/"
     },
     {
@@ -144,7 +144,7 @@
       "scheme": "light",
       "best_for": "BytePlus decks that should match the official light PowerPoint look: pptx conversions, architecture diagrams framed on white plates, product pitches with image and video proof, the About-BytePlus timeline.",
       "avoid_for": "Dark-room keynote moods (use byteplus), non-BytePlus brands, Bible/teaching decks.",
-      "slide_count": 10,
+      "slide_count": 11,
       "path": "templates/byteplus-light/"
     },
     {

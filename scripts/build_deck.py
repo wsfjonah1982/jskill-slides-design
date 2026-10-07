@@ -13,6 +13,7 @@ see templates/byteplus/design.md.
 import html
 import re
 import shutil
+import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -45,6 +46,12 @@ else:
     PART_MARK = f'<img class="part-mark" src="{I}bp-mark.png" alt="" />'
     KICKER_TEXT = "BytePlus Industry Solution"
     BRAND_FILES = [LOGO_FILE, "bp-mark.png"] + (["bg-light-cover.jpg", "bg-light-content.jpg"] if LIGHT else [])
+
+
+sys.path.insert(0, str(TEMPLATE_DIR.parents[1] / "scripts"))   # the skill's scripts/ (layer_slide.py)
+from layer_slide import layer_wrap  # noqa: E402
+
+LAYER_DIRS = []   # layer-playground folders used by the slides; build() copies them to OUT's assets/img/layers/
 
 
 def esc(t):
@@ -126,6 +133,18 @@ def video_placeholder(ratio, label, fullscreen=False):
                   <span class="play-btn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
                   <span class="snd">Click to play</span>
                 </div>'''
+
+
+def layers(layers_dir=None):
+    """Layer playground body for feature(...): drag / resize / rotate cut-out layers, move them between two images.
+    layers_dir = the deck's folder with layers.json + its images (see scripts/layer_slide.py); it is copied to
+    assets/img/layers/. Run python scripts/layer_slide.py masks <dir>/layers.json after changing images.
+    No folder yet: layers() gives the striped placeholder layout."""
+    if layers_dir is None:
+        return layer_wrap(None)
+    d = Path(layers_dir)
+    LAYER_DIRS.append(d)
+    return layer_wrap(d / "layers.json", f"{I}layers/")
 
 
 def mcell(label, inner):
@@ -210,6 +229,12 @@ def example_agent(n, total):
                    "What goes in, what comes out.", inner, notes="Speaker notes (press N).")
 
 
+def example_layers(n, total):
+    return feature(n, total, "Part 01 · Example", "Layered Generation. <em>Move Any Object.</em>",
+                   "One image in, a clean background and every object as its own layer out.", layers(),   # layers(<folder>)
+                   tag=None if GENERIC else "Seedream 5.0 Pro")
+
+
 def closing(n, total):
     return f'''
       <!-- ═══════ SLIDE {n} · THANK YOU ═══════════════════════════════════════ -->
@@ -232,6 +257,7 @@ SLIDES = [
     lambda n, t: part(n, t, 1, "Test Ideas <em>in Minutes</em>", "Reduce time to market",
                       EXAMPLE_CARDS),
     example_agent,
+    example_layers,
     closing,
 ]
 
@@ -253,6 +279,10 @@ def build():
     for f in BRAND_FILES:
         if not (img_dir / f).exists():
             shutil.copy2(TEMPLATE_DIR / "assets" / "img" / f, img_dir / f)
+    assert len(set(LAYER_DIRS)) <= 1, "one layers folder per deck (assets/img/layers/)"
+    for d in set(LAYER_DIRS):
+        if d.resolve() != (img_dir / "layers").resolve():
+            shutil.copytree(d, img_dir / "layers", dirs_exist_ok=True)
     print("ok", OUT, len(out), "bytes,", total, "slides")
 
 

@@ -72,6 +72,21 @@ data-panel="0">…</div>` (others `hidden`). Used to merge three near-identical 
 into one clickable slide. The chosen tab persists when you leave and return. Panels with `display:flex` need the
 `[hidden]{display:none!important}` rule (included).
 
+## Layer playground
+
+`scripts/layer_slide.py` → `layer_wrap(layers.json)` (`layers()` in `build_deck.py`): one or two images, each a
+clean background + transparent cut-out layers (e.g. Seedream layer output). The audience drags an object, resizes it
+from a corner (20–400 %), rotates it from the top handle (Shift = 15° steps), drops it on the other image (it lands
+on top; dropped outside both, it glides back), hides the backgrounds, holds a button or an image's "Original" card
+to compare with the untouched image, and resets. A thumbnail tray per image selects layers.
+- Clicks hit visible pixels only: each layer carries a 40-column alpha mask (`python scripts/layer_slide.py masks
+  layers.json`, Pillow). Without masks, a click on the transparent corner of a big PNG would grab it.
+- The selection box sits outside the clipped canvas, so handles stay reachable when an object grows past the edge.
+- Pointer events on the wrap work for mouse, touch and pen; a capture-phase guard stops a touch drag on an image
+  from also swiping to the next slide. Keys, wheel, lightbox and the video model are untouched. Edits persist when
+  you leave and return to the slide; Reset restores everything.
+- Layout fits the remaining slide height (container query): canvases shrink before the tray or the buttons overflow.
+
 ## Speaker notes and fullscreen
 
 `slide(..., notes="…")` → `data-notes`; press **N** to toggle the notes panel (plain text). **F** toggles

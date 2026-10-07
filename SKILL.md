@@ -14,7 +14,7 @@ opens in a browser, drives with arrow keys, and that looks finished at any 16:9 
 |---|---|
 | New deck from notes / md / txt | `references/intake-and-story.md` → `references/design-systems.md` → `references/components-and-layouts.md` |
 | Convert an existing `.pptx` | `references/intake-and-story.md` (pptx section) + run `scripts/pptx_extract.py` |
-| Deck has video, popups, tabs, zoom, speaker notes | `references/media-popups-runtime.md` |
+| Deck has video, popups, tabs, zoom, layer playground, speaker notes | `references/media-popups-runtime.md` |
 | Needs a generated illustration, logo cut-out, or background match | `references/images-and-assets.md` |
 | Editing an existing deck ("md updated", "pptx is updated", "move X by N px") | `references/qa-export-gotchas.md` (Edit safely) first, then the deck's own `README.md` |
 | Before every delivery | `references/qa-export-gotchas.md` (QA checklist) |
@@ -79,7 +79,7 @@ picking), `design.md` (tokens in YAML front matter + rules). Read `design.md` be
 
 | Template | Use for | Engine |
 |---|---|---|
-| `byteplus/` | BytePlus solution / product pitches with image + video proof; brand logos + timeline in `assets/img/` | fluid navy/gold slides + media runtime |
+| `byteplus/` | BytePlus solution / product pitches with image + video proof (incl. an interactive layer playground); brand logos + timeline in `assets/img/` | fluid navy/gold slides + media runtime |
 | `byteplus-light/` | the same BytePlus deck in the light look of the official BytePlus pptx master (pale blue gradient backgrounds, dark logo, BytePlus blue); best for pptx conversions and architecture diagrams | same as `byteplus`, generated from it |
 | `ai-tech-light/` | brand-free AI tech deck in the byteplus-light look: no logo, AI icon in concentric circles on cover / part / end, generic About-[Organisation] timeline; for AI product or solution pitches by any organisation | same as `byteplus`, generated from it |
 | `work-review/` | generic review of project progress or work performance (no personal / company info): results vs goals, workstreams, initiatives, reflections, next steps, popups | fluid navy/gold slides + popup system |
@@ -93,7 +93,8 @@ To start: copy the template folder into the project, rename `template.html`, del
 
 | Path | What it is |
 |---|---|
-| `scripts/build_deck.py` | Generator on top of `templates/byteplus/`, `templates/byteplus-light/` or `templates/ai-tech-light/` (set `TEMPLATE_DIR`): helpers `feature() cover() part() closing() frame(plate=) diagram() video() video_placeholder() mcell() mrow() pills() points()`; copies the brand images |
+| `scripts/build_deck.py` | Generator on top of `templates/byteplus/`, `templates/byteplus-light/` or `templates/ai-tech-light/` (set `TEMPLATE_DIR`): helpers `feature() cover() part() closing() frame(plate=) diagram() video() video_placeholder() mcell() mrow() pills() points() layers()`; copies the brand images and the layer-playground images |
+| `scripts/layer_slide.py` | Layer playground (drag / resize / rotate cut-out layers, move them between two images): `layer_wrap(layers.json)` markup, `LAYER_CSS` / `LAYER_JS`; `masks <layers.json>` builds the click masks from the PNGs (Pillow); `sync <html>` pushes CSS/JS changes into a template or deck |
 | `scripts/make_byteplus_light.py` | Regenerates `templates/byteplus-light/template.html` from `templates/byteplus/` — re-run after any byteplus change |
 | `scripts/make_ai_tech_light.py` | Regenerates `templates/ai-tech-light/template.html` from `templates/byteplus/` + the light CSS (`--images` rebuilds the AI-icon cover background) — re-run after any byteplus or byteplus-light change |
 | `scripts/validate_deck.js` | Static checks: JS syntax, duplicate IDs, missing local assets, slide IDs, tiny fonts, `object-fit: cover` |

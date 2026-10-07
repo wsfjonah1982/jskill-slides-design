@@ -94,6 +94,13 @@ def light_css():
 def build_html():
     s = SRC.read_text(encoding="utf-8")
     s = s.replace("<title>BytePlus Template</title>", "<title>AI Tech Light Template</title>", 1)
+    # no layer-playground slide in this template (the CSS / script stay for decks that add one): drop slide 7, renumber
+    a = s.index("      <!-- ═══════ SLIDE 7 · LAYER PLAYGROUND")
+    b = s.index("      <!-- ═══════ SLIDE 8 ·")
+    s = s[:a] + s[b:]
+    for n in range(8, 12):
+        s = s.replace(f'id="s{n:02d}"', f'id="s{n - 1:02d}"').replace(f"<!-- ═══════ SLIDE {n} ·", f"<!-- ═══════ SLIDE {n - 1} ·")
+    s = re.sub(r"(\d\d) / 11<", lambda m: f"{int(m.group(1)) - (1 if int(m.group(1)) >= 8 else 0):02d} / 10<", s)
     # no logo anywhere, no part watermark (the background carries the AI icon)
     s, n_logo = re.subn(r'\n[ \t]*<img class="bp-logo[^>]*/>', "", s)
     s, n_mark = re.subn(r'\n[ \t]*<img class="part-mark"[^>]*/>', "", s)
@@ -104,7 +111,7 @@ def build_html():
     s = s[:a] + about_slide() + s[b:]
     # brand words → placeholders
     s = s.replace("BytePlus Industry Solution", "[Organisation] · AI Solution")
-    s = s.replace('<span class="tag">Seedream 5.0</span>', '<span class="tag">[Model A]</span>')
+    s = s.replace('<span class="tag">Seedream 5.0 Pro</span>', '<span class="tag">[Model A]</span>')
     s = s.replace('<span class="tag">Seedance 2.5</span>', '<span class="tag">[Model B]</span>')
     s = s.replace("<h3 class=\"h3\">Seedream 5.0</h3><p>Multimodal AI image generation and editing model</p>",
                   "<h3 class=\"h3\">[Model A]</h3><p>[What it does, in one line]</p>")
